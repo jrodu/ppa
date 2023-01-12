@@ -1,5 +1,5 @@
 Package: ppa
-Title: What the Package Does (One Line, Title Case)
+Title: Usable example app for plot panel analysis
 Version: 0.0.0.9000
 Authors@R: 
     person("Jordan", "Rodu", , "first.last@example.com", role = c("aut", "cre"),
