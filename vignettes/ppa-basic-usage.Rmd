@@ -1,0 +1,29 @@
+---
+title: "ppa-basic-usage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ppa-basic-usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+Note that any libraries you wish to use should be called prior to launching a ppa app session.
+```{r setup, eval=FALSE}
+library(ppa)
+library(tidyverse)
+```
+
+```{r example_run_app, eval=FALSE}
+# running the ppa app with no row or column specification
+example_data_no_row_col %>% ppa(x, y, z, 'line')
+
+# running the ppa app with row and column specification.  The app can also be run specifying either rowgroup OR colgroup
+example_data_with_row_col %>% ppa(x, y, z, 'line', rowgroup=rows, colgroup=cols)
+
+```
