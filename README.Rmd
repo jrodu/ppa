@@ -65,7 +65,7 @@ xlab(NULL) +
         axis.text.y = element_blank(),
         axis.title.x = element_blank(),
         panel.border = element_blank(), panel.background = element_rect(fill="white"),
-        panel.grid = element_line(colour = "grey70"))
+        panel.grid = element_line(colour = "grey70"), plot.margin=margin(0,2,0,0, "cm"))
 
 
 example_data_from_paper %>% ggplot(aes(seconds, y))+geom_line(aes(group=series)) + facet_wrap(~identity_random) +
