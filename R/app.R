@@ -93,8 +93,16 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
   shiny::checkboxInput("placePanels", "Arrange Panels in Scatter Plot", FALSE),
   shiny::checkboxInput("transformPanels", "Transform Panels", FALSE),
   shiny::hr(),
-  shiny::tags$img(id = "fake", src =NA, width = "0px", height = "0px")
-
+  shiny::tags$img(id = "fake1", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake2", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake3", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake4", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake5", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake6", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake7", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake8", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake9", src =NA, width = "0px", height = "0px"),
+  shiny::tags$img(id = "fake10", src =NA, width = "0px", height = "0px")
 
   )
     )
@@ -148,10 +156,46 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### axes ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake1",
       where = "afterEnd",
       ui = axesUI("axes")
     )
+
+
+    maxchecks <- function(){
+      totchecked <- input$viewVariables + input$viewShuffle + input$viewSelectors +
+        input$excludePanels + input$labelPanels + input$scorePanels +
+        input$comparePanels + input$placePanels + input$transformPanels
+      if(totchecked==3){
+        if(!input$viewVariables) shinyjs::disable("viewVariables")
+        if(!input$viewShuffle) shinyjs::disable("viewShuffle")
+        if(!input$viewSelectors) shinyjs::disable("viewSelectors")
+        if(!input$excludePanels) shinyjs::disable("excludePanels")
+        if(!input$labelPanels) shinyjs::disable("labelPanels")
+        if(!input$scorePanels) shinyjs::disable("scorePanels")
+        if(!input$comparePanels) shinyjs::disable("comparePanels")
+        if(!input$placePanels) shinyjs::disable("placePanels")
+        if(!input$transformPanels) shinyjs::disable("transformPanels")
+      }
+      if(totchecked<3){
+        shinyjs::enable("viewVariables")
+        shinyjs::enable("viewShuffle")
+        shinyjs::enable("viewSelectors")
+        shinyjs::enable("excludePanels")
+        shinyjs::enable("labelPanels")
+        if(input$comparePanels){
+            shinyjs::disable("scorePanels")
+          }else{
+            shinyjs::enable("scorePanels")}
+        if(input$scorePanels){
+          shinyjs::disable("comparePanels")
+          }else{
+            shinyjs::enable("comparePanels")
+          }
+        shinyjs::enable("placePanels")
+        shinyjs::enable("transformPanels")
+      }
+    }
 
     observeEvent(input$viewVariables, {
       if(input$viewVariables){
@@ -159,7 +203,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
         }else{
           shinyjs::hide(id="axes-axes")
       }
-
+      maxchecks()
 
 
 
@@ -170,7 +214,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### shuffle ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake2",
       where = "afterEnd",
       ui = shufflePanelUI("shuffle")
     )
@@ -181,7 +225,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
       }else{
         shinyjs::hide(id="shuffle-shuffle")
       }
-
+      maxchecks()
 
 
 
@@ -192,7 +236,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### selectors ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake3",
       where = "afterEnd",
       ui = unselectAllUI("unselectpanels")
     )
@@ -203,7 +247,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
       }else{
         shinyjs::hide(id="unselectpanels-unselect")
       }
-
+      maxchecks()
 
     })
 
@@ -213,7 +257,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### exclude ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake4",
       where = "afterEnd",
       ui = excludeUI("exclude")
     )
@@ -224,7 +268,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
       }else{
         shinyjs::hide(id="exclude-exclude")
       }
-
+      maxchecks()
 
       })
 
@@ -234,7 +278,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### ecdf ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake8",
       where = "afterEnd",
       ui = plotECDFUI("ecdf")
     )
@@ -245,7 +289,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
       }else{
         shinyjs::hide(id="ecdf-ecdf")
       }
-
+      maxchecks()
 
     })
 
@@ -254,7 +298,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### score ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake6",
       where = "afterEnd",
       ui = scoreByFunctionUI("score")
     )
@@ -265,7 +309,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
       }else{
         shinyjs::hide(id = "score-scorebyfunction")
       }
-
+      maxchecks()
     })
 
     scoreByFunctionServer("score", pipeline_variables)
@@ -274,7 +318,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### compare ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake7",
       where = "afterEnd",
       ui = scoreByComparisonUI("compare")
     )
@@ -285,7 +329,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
       }else{
         shinyjs::hide(id="compare-compare")
       }
-
+      maxchecks()
     })
 
     scoreByComparisonServer("compare", pipeline_variables)
@@ -295,7 +339,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### label ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake5",
       where = "afterEnd",
       ui = labelUI("label")
     )
@@ -307,7 +351,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
         shinyjs::hide(id="label-label")
       }
 
-
+      maxchecks()
     })
 
     labelServer("label", pipeline_variables)
@@ -317,7 +361,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### place ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake9",
       where = "afterEnd",
       ui = placePanelsUI("place")
     )
@@ -329,7 +373,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
         shinyjs::hide(id="place-place")
       }
 
-
+      maxchecks()
     })
 
     placePanelsServer("place", pipeline_variables)
@@ -338,7 +382,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     ######################### Transform ###################################
 
     shiny::insertUI(
-      selector = "#fake",
+      selector = "#fake10",
       where = "afterEnd",
       ui = transformUI("transform")
     )
@@ -350,7 +394,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
       }else{
         shinyjs::hide(id="transform-transform")
       }
-
+      maxchecks()
 
     })
 

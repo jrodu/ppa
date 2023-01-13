@@ -41,6 +41,8 @@ transformServer <- function(id, pipeline_variables) {
     type <- NULL
     ns <- session$ns
 
+
+
     output$transform <- shiny::renderUI(
       shiny::tagList(
         shiny::tags$h4("Transform Panel"),
@@ -55,9 +57,11 @@ transformServer <- function(id, pipeline_variables) {
                       a similar function, create a new one.
                       "),
         newTransformFunctionUI(ns("tform")),
-        shiny::selectizeInput(ns('trnsfm'), label=NULL, choices=character(),
-                              options = list(create = TRUE, placeholder="Select a previously defined transform function"),
-                              multiple=FALSE), shiny::actionButton(ns("edit_tform"), "Edit"),
+#        shiny::selectizeInput(ns('trnsfm'), label=NULL, choices=character(),
+#                              options = list(create = TRUE, placeholder="Select a previously defined transform function"),
+#                              multiple=FALSE),
+        transformbuttonUI(ns("transformselectize")),
+        shiny::actionButton(ns("edit_tform"), "Edit"),
 
         shiny::actionButton(ns("transform"), "transform data"),
 
@@ -67,12 +71,21 @@ transformServer <- function(id, pipeline_variables) {
     )
 
     newTransformFunctionServer("tform", pipeline_variables)
+    transform_fn <- transformbuttonServer("transformselectize", pipeline_variables)
+
 
     shiny::observeEvent(input$transform, {
 
+      if(!isTruthy(transform_fn())) {#check if selectize is null
+        # fn_txt <- paste('f_compare <- function(panel_data) {', input$filterval, '}', sep='')
+        #
+        # fn_label <- input$functionValueName
+        # pipeline_variables$filter_value_functions <- pipeline_variables$filter_value_functions %>% dplyr::add_row(name=fn_label, fn=input$filterval)
+        errorhandle <- "need to select a function!"
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Make sure to select a function first!"), type = "error")
+      } else{
 
-        fn_label <- input$trnsfm
-        fn_txt_tmp <- pipeline_variables$transform_functions %>% dplyr::filter(.data$name==fn_label) %>% dplyr::select(.data$fn)
+        fn_txt_tmp <- pipeline_variables$transform_functions %>% dplyr::filter(.data$name==transform_fn()) %>% dplyr::select(.data$fn)
         fn_snippet <- fn_txt_tmp$fn
         fn_txt <- paste('f_transform <- function(panel_data) {', fn_txt_tmp$fn, '}', sep='')
 
@@ -82,25 +95,28 @@ transformServer <- function(id, pipeline_variables) {
       #print(pipeline_variables$tree)
       #print(pipeline_variables$current_anchor)
 
-
-      eval(parse(text = fn_txt))
+      errorhandle <- NULL
+      tryCatch(eval(parse(text = fn_txt)), error = function(e) {errorhandle <<- "there might be an issue with your parsing"})
 
       tmp_try <- NULL
 
-      try(tmp_try <- transform_data(pipeline_variables$df_main, f_transform))
+      if(is.null(errorhandle)){
 
+        tryCatch(tmp_try <- transform_data(pipeline_variables$df_main, f_transform),
+                 error = function(e) {errorhandle <<- "your code is throwing an error"},
+                 warning=function(w) {errorhandle <<- "throwing some warnings here..."})
 
-      if(!is.null(tmp_try)){
+      if(is.null(errorhandle)){
 
 
 
         #enter into the tree of actions.  Need to check if currently there.  i.e. check if fn_label exists in tree with current_anchor as parent.
 
         #check if this transform is already in the tree:
-        tmpcheck <- pipeline_variables$tree %>% dplyr::filter(.data$name==fn_label, .data$parentId==pipeline_variables$current_anchor, .data$type=="transform")
+        tmpcheck <- pipeline_variables$tree %>% dplyr::filter(.data$name==transform_fn(), .data$parentId==pipeline_variables$current_anchor, .data$type=="transform")
         if(nrow(tmpcheck)==0){
           max_tree <- max(pipeline_variables$tree$id)
-          pipeline_variables$tree <- pipeline_variables$tree %>% dplyr::add_row(id = max_tree+1, parentId = pipeline_variables$current_anchor, name=fn_label, type="transform", expression1=fn_snippet)
+          pipeline_variables$tree <- pipeline_variables$tree %>% dplyr::add_row(id = max_tree+1, parentId = pipeline_variables$current_anchor, name=transform_fn(), type="transform", expression1=fn_snippet)
 
           pipeline_variables$current_anchor <- max_tree+1
         } else {
@@ -117,7 +133,11 @@ transformServer <- function(id, pipeline_variables) {
       gargoyle::trigger("send_to_panel_plot")
 
       } else {
-        shinyalert::shinyalert("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Select a function and click 'edit' to edit the function.", type = "error")
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Maybe this is a hint: ",errorhandle, ". Select the function and click 'edit' to edit the function."), type = "error")
+      }
+      }else{
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Maybe this is a hint: ",errorhandle, ". Select the function and click 'edit' to edit the function."), type = "error")
+      }
       }
 
     })
@@ -130,11 +150,11 @@ transformServer <- function(id, pipeline_variables) {
                              closeOnEsc = TRUE,
                              closeOnClickOutside = TRUE,
                              showConfirmButton = FALSE,text = tagList(
-                               shinyjs::disabled(textInput(ns("editTransformName"), label=NULL, value=input$trnsfm)),
+                               shinyjs::disabled(textInput(ns("editTransformName"), label=NULL, value=transform_fn())),
                                textAreaInput(ns("edittransformval"),
                                              label="function(panel_data) {",
                                              value=pipeline_variables$transform_functions %>%
-                                               dplyr::filter(.data$name==input$trnsfm) %>% dplyr::select(.data$fn),
+                                               dplyr::filter(.data$name==transform_fn()) %>% dplyr::select(.data$fn),
                                              width="100%", height="300px"), strong("}"),
                                shiny::br(),
                                shiny::actionButton(ns("submitedtransformfunction"), "confirm edit")
@@ -161,13 +181,13 @@ transformServer <- function(id, pipeline_variables) {
 
 
 
-    shiny::observe({
-
-      gargoyle::watch("transform_selectize_update")
-      shiny::updateSelectizeInput(session, inputId = "trnsfm", choices=pipeline_variables$transform_functions$name, selected=character())
-
-
-    })
+    # shiny::observe({
+    #
+    #   gargoyle::watch("transform_selectize_update")
+    #   shiny::updateSelectizeInput(session, inputId = "trnsfm", choices=pipeline_variables$transform_functions$name, selected=character())
+    #
+    #
+    # })
 
     shiny::observeEvent(input$returnToRaw, {
       pipeline_variables$df_main <- pipeline_variables$backup_df

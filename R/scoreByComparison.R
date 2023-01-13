@@ -68,8 +68,10 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
                   the comparison score will be shown in a tooltip.  To label the panels after you are satisfied with the
                   selection, open the 'label' panel"),
       newComparisonFunctionUI(ns("fbys")),
-      shiny::selectizeInput(ns("filterbyselection"), label=NULL, choices=character(), selected = NULL, multiple = FALSE,
-                            options = list(placeholder="select comparison function")), shiny::actionButton(ns("edit_comparison"), "Edit"),
+      comparisonbuttonUI(ns("comparisonselectize")),
+      # shiny::selectizeInput(ns("filterbyselection"), label=NULL, choices=character(), selected = NULL, multiple = FALSE,
+      #                       options = list(placeholder="select comparison function")),
+      shiny::actionButton(ns("edit_comparison"), "Edit"),
       shiny::actionButton(ns("filterSelection"), "Select by Comparison"),
       #### the ecdf plot
       #plotECDFUI(ns("ecdf")),
@@ -82,35 +84,54 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
 
 
     newComparisonFunctionServer("fbys", pipeline_variables)
-    shiny::observe({
-      gargoyle::watch("compare_selectize_update")
-      shiny::updateSelectizeInput(session, inputId = "filterbyselection", choices=pipeline_variables$filter_selection_functions$name, selected=character())
-    })
+    compare_fn <- comparisonbuttonServer("comparisonselectize", pipeline_variables)
+
+    # shiny::observe({
+    #   gargoyle::watch("compare_selectize_update")
+    #   shiny::updateSelectizeInput(session, inputId = "filterbyselection", choices=pipeline_variables$filter_selection_functions$name, selected=character())
+    # })
 
     shiny::observeEvent(input$filterSelection, {
       pipeline_variables$reset_filter_criterion()
 
       session$sendCustomMessage(type = 'clear_invert', message = "clear_invert")
 
-      if(!isTruthy(input$filterbyselection)) {#check if selectize is null
-        fn_txt <- paste('f_compare <- function(panel_data, panel_selected) {', input$filtercomp, '}', sep='')
+      errorhandle <- NULL
 
-        fn_label <- input$functionName
-        pipeline_variables$filter_selection_functions <- pipeline_variables$filter_selection_functions %>% dplyr::add_row(name=fn_label, fn=input$filtercomp)
+      if(!isTruthy(compare_fn())) {#check if selectize is null
+        # fn_txt <- paste('f_compare <- function(panel_data, panel_selected) {', input$filtercomp, '}', sep='')
+        #
+        # fn_label <- input$functionName
+        # pipeline_variables$filter_selection_functions <- pipeline_variables$filter_selection_functions %>% dplyr::add_row(name=fn_label, fn=input$filtercomp)
+        errorhandle <- "need to select a function!"
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Make sure to select a function first!"), type = "error")
       } else{
-        fn_txt_tmp <- pipeline_variables$filter_selection_functions %>% dplyr::filter(.data$name==input$filterbyselection) %>% dplyr::select(.data$fn)
+        fn_txt_tmp <- pipeline_variables$filter_selection_functions %>% dplyr::filter(.data$name==compare_fn()) %>% dplyr::select(.data$fn)
         fn_txt <- paste('f_compare <- function(panel_data, panel_selected) {', fn_txt_tmp$fn, '}', sep='')
 
-      }
 
       tmp_try <- NULL
-      eval(parse(text = fn_txt))
-      try(tmp_try <- get_comparison_scores( pipeline_variables$df_main,  pipeline_variables$cur_selection, f_compare) %>% dplyr::mutate(use_score=1, use_pos=0))
 
-      if(!is.null(tmp_try)){
+
+      tryCatch(eval(parse(text = fn_txt)), error = function(e) {errorhandle <<- "there might be an issue with your parsing"})
+
+      if(length(pipeline_variables$cur_selection)!=1){
+        errorhandle <- "need to select a panel!"
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Make sure to select one--and only one-- panel!"), type = "error")
+      }else{
+
+      if(is.null(errorhandle)){
+        tryCatch(tmp_try <- get_comparison_scores( pipeline_variables$df_main,  pipeline_variables$cur_selection, f_compare) %>% dplyr::mutate(use_score=1, use_pos=0),
+                 error = function(e) {errorhandle <<- "your code is throwing an error"},
+                 warning=function(w) {errorhandle <<- "throwing some warnings here..."})
+
+      if(is.null(errorhandle)){
       pipeline_variables$filtereddf <- tmp_try
 
-      scores <-  pipeline_variables$filtereddf %>% dplyr::filter(.data$panel_string !=  pipeline_variables$cur_selection)
+      tryCatch(scores <-  pipeline_variables$filtereddf %>% dplyr::filter(.data$panel_string !=  pipeline_variables$cur_selection),
+               error = function(e) {errorhandle <<- "your code is throwing an error"},
+               warning=function(w) {errorhandle <<- "throwing some warnings here..."})
+      if(is.null(errorhandle)){
       cutoff <- stats::quantile(scores$score, probs=.05)
       filter_cutoff <-  pipeline_variables$filtereddf %>% dplyr::filter(.data$score<cutoff)
       new_centers <- pipeline_variables$centers
@@ -138,8 +159,16 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
       session$sendCustomMessage(type = "data_ecdf",
                                 message = jsonlite::toJSON(tibble::tibble(x=x, y=ecdf_data)))
     }else{
-      shinyalert::shinyalert("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Select the function and click 'edit' to edit the function.", type = "error")
+      shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Maybe this is a hint: ",errorhandle, ". Select the function and click 'edit' to edit the function."), type = "error")
     }
+      }else{
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Maybe this is a hint: ",errorhandle, ". Select the function and click 'edit' to edit the function."), type = "error")
+      }
+      }else{
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Maybe this is a hint: ",errorhandle, ". Select the function and click 'edit' to edit the function."), type = "error")
+      }
+      }
+      }
 
     })
 
@@ -149,11 +178,11 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
                              closeOnEsc = TRUE,
                              closeOnClickOutside = TRUE,
                              showConfirmButton = FALSE,text = tagList(
-                               shinyjs::disabled(textInput(ns("editComparisonName"), label=NULL, value=input$filterbyselection)),
+                               shinyjs::disabled(textInput(ns("editComparisonName"), label=NULL, value=compare_fn())),
                                textAreaInput(ns("editcomparisonval"),
                                              label="function(panel_data, panel_selected) {",
                                              value=pipeline_variables$filter_selection_functions %>%
-                                               dplyr::filter(.data$name==input$filterbyselection) %>% dplyr::select(.data$fn),
+                                               dplyr::filter(.data$name==compare_fn()) %>% dplyr::select(.data$fn),
                                              width="100%", height="300px"), strong("}"),
                                shiny::br(),
                                shiny::actionButton(ns("submitedcomparisonfunction"), "confirm edit")

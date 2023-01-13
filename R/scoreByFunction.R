@@ -83,24 +83,32 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
     shiny::observeEvent(input$filterValue, {
       pipeline_variables$reset_filter_criterion()
 
+      errorhandle <- NULL
+
       session$sendCustomMessage(type = 'clear_invert', message = "clear_invert")
 
       if(!isTruthy(filter_fn())) {#check if selectize is null
-        fn_txt <- paste('f_compare <- function(panel_data) {', input$filterval, '}', sep='')
-
-        fn_label <- input$functionValueName
-        pipeline_variables$filter_value_functions <- pipeline_variables$filter_value_functions %>% dplyr::add_row(name=fn_label, fn=input$filterval)
+        # fn_txt <- paste('f_compare <- function(panel_data) {', input$filterval, '}', sep='')
+        #
+        # fn_label <- input$functionValueName
+        # pipeline_variables$filter_value_functions <- pipeline_variables$filter_value_functions %>% dplyr::add_row(name=fn_label, fn=input$filterval)
+        errorhandle <- "need to select a function!"
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Make sure to select a function first!"), type = "error")
       } else{
         fn_txt_tmp <- pipeline_variables$filter_value_functions %>% dplyr::filter(.data$name==filter_fn()) %>% dplyr::select(.data$fn)
         fn_txt <- paste('f_compare <- function(panel_data) {', fn_txt_tmp$fn, '}', sep='')
 
-      }
-
       tmp_try <- NULL
-      eval(parse(text = fn_txt))
-      try(tmp_try <- get_value_scores(pipeline_variables$df_main, f_compare) %>% dplyr::mutate(use_score=1, use_pos=0))
 
-      if(!is.null(tmp_try)){
+
+      tryCatch(eval(parse(text = fn_txt)), error = function(e) {errorhandle <<- "there might be an issue with your parsing"})
+
+      if(is.null(errorhandle)){
+      tryCatch(tmp_try <- get_value_scores(pipeline_variables$df_main, f_compare) %>% dplyr::mutate(use_score=1, use_pos=0),
+               error = function(e) {errorhandle <<- "your code is throwing an error"},
+               warning=function(w) {errorhandle <<- "throwing some warnings here..."})
+
+      if(is.null(errorhandle)){
       pipeline_variables$filtereddf <-tmp_try
       cutoff <- stats::quantile(pipeline_variables$filtereddf$score, probs=.05)
 
@@ -127,7 +135,11 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
                                 message = jsonlite::toJSON(tibble::tibble(x=x, y=ecdf_data)))
 
       }else{
-        shinyalert::shinyalert("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Select the function and click 'edit' to edit the function.", type = "error")
+        shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Maybe this is a hint: ",errorhandle, ". Select the function and click 'edit' to edit the function."), type = "error")
+      }
+        }else{
+          shinyalert::shinyalert(paste0("Oops!", "Code didn't run.  Perhaps there is a typo in your function?  Maybe this is a hint: ",errorhandle, ". Select the function and click 'edit' to edit the function."), type = "error")
+        }
       }
 
     })
