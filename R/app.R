@@ -81,6 +81,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
 
                 #shiny::tags$h4("Panel Settings"),
   ###### axes
+  shiny::tags$p("Select up to 3 at a time. 'Score' and 'Comparison' cannot be selected simultaneously."),
   shiny::checkboxInput("viewVariables", "Individual Panel Settings", FALSE),
   #tooltip("viewVariables", "tooltip tester"),
   shiny::checkboxInput("viewShuffle", "Panel Shufflers", FALSE),
