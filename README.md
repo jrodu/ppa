@@ -22,6 +22,7 @@ You can install the development version of ppa from
 
 ``` r
 # install.packages("devtools")
+devtools::install_github("daattali/shinyalert") #requires dev version of shinyalert
 devtools::install_github("jrodu/ppa")
 ```
 
