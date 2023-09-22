@@ -151,3 +151,19 @@ example_data_with_row_col %>% ppa(x, y, z, 'line', rowgroup=rows, colgroup=cols)
       transformation “state.” The plot panels will revert to that state,
       and you can apply the desired transformation (or continue your
       investigation) from there.
+
+## A few tips and notes
+
+1.  Plan to handle NAs in the plotting variables on your end for now.
+    The plots will still render in the presence of NAs, but data in a 
+    tibble that comes after an NA will not be plotted (so you may be left
+    with only a portion of the plot).  When working inside the app, the main
+    place this will matter is when using the "Transform Panels" functionality.
+    Note that you can take care of NAs inside the transform function, so you
+    need not avoid transformations that will produce NAs (i.e. a lag function
+    or similar).  I plan to work on this for future updates.
+2.  Have a set of score/compare/transform functions that you know a prior you 
+    would like to use but don't want to re-type them into the
+    function input boxes?  No problem!  Just make sure they are in your environment
+    when you launch the app, and write a wrapper function for them in the input boxes
+    in the app!
