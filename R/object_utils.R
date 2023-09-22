@@ -43,7 +43,7 @@ get_plot_vals <- function(data, x, y, key){
   data <- data %>% dplyr::mutate(dotx = !!rlang::sym(.x), doty = !!rlang::sym(.y))%>%
     dplyr::mutate(panel_string = !!key) %>% dplyr::mutate(panel_string=as.character(panel_string)) #make sure the panel string works.
 
-  data
+  data %>% drop_na(dotx, doty)
 
 }
 
