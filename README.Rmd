@@ -36,6 +36,8 @@ devtools::install_github("daattali/shinyalert") #requires dev version of shinyal
 devtools::install_github("jrodu/ppa")
 ```
 
+Please note that at present installing "shinyalert" from Github is required, as there is a bug fix in that package that has not yet been pushed to CRAN.
+
 ## A simple motivational example
 
 Consider the following set of time series
@@ -148,10 +150,29 @@ unexclude all previously excluded panels.
     + select panels by moving the threshold on the resulting ECDF plot
     + invert the selected panels (i.e. selecting panels that lie "above" the threshold rather than "below")
     + investigate the score of individual time series by hovering over them and exposing a tooltip.
+    
+Here is a score you can try (note- don't forget to name the function so that you can access it later!):
+```{r ppaapp_score, eval=FALSE}
+panel_data %>% summarize(max=max(y)) %>% pull(max)
+
+#or (same thing, different syntax)
+
+max(panel_data$y)
+```
+
 8. The "Select Panels by Comparison" checkbox allows you to do the same as selecting by score function, but using a user-suppled function that compares each panel to a selected panel.
 9. The "Arrange Panels in Scatter Plot" checkbox allows you to observe the relationship between two
 different measurement functions from the "Select by Score Function" module.
 10. The "Transform Panels" checkbox allows you to rapidly investigate a data transformation or series of transformations.
     + When the first transformation is applied, a plot will appear in the right-hand column that is a tree plot that records the transformations attempted.  Multiple transformations in succession will result in a series of nodes corresponding to a "branch" of the tree.  
     + To revert to a previous transformation (either to continue with analysis or create a new branch of successive transformations) simply click on the node on the tree corresponding to your desired transformation "state."  The plot panels will revert to that state, and you can apply the desired transformation (or continue your investigation) from there.
+    
+Here are a transformation you can try (note- don't forget to name the function so that you can access it later!):
+```{r ppaapp_transformation, eval=FALSE}
+panel_data %>% mutate(y=y^2)
+```
+Go ahead, try a few!  Try to chain them together in different ways and navigate through the various transformations to get a feel for using the navigation tree.
 
+## Tip
+
+Have a set of score/compare/transform functions that you know a prior you would like to use but don't want to re-type them into the function input boxes? No problem! Just make sure they are in your environment when you launch the app, and write a wrapper function for them in the input boxes in the app!

@@ -26,9 +26,16 @@ devtools::install_github("daattali/shinyalert") #requires dev version of shinyal
 devtools::install_github("jrodu/ppa")
 ```
 
+Please note that at present installing “shinyalert” from Github is
+required, as there is a bug fix in that package that has not yet been
+pushed to CRAN.
+
 ## A simple motivational example
 
 Consider the following set of time series
+
+    #> Warning: package 'ggplot2' was built under R version 4.3.1
+    #> Warning: package 'purrr' was built under R version 4.3.1
 
 <img src="man/figures/README-oracle-1.png" width="30%" />
 
@@ -132,6 +139,18 @@ example_data_with_row_col %>% ppa(x, y, z, 'line', rowgroup=rows, colgroup=cols)
       the threshold rather than “below”)
     - investigate the score of individual time series by hovering over
       them and exposing a tooltip.
+
+Here is a score you can try (note- don’t forget to name the function so
+that you can access it later!):
+
+``` r
+panel_data %>% summarize(max=max(y)) %>% pull(max)
+
+#or (same thing, different syntax)
+
+max(panel_data$y)
+```
+
 8.  The “Select Panels by Comparison” checkbox allows you to do the same
     as selecting by score function, but using a user-suppled function
     that compares each panel to a selected panel.
@@ -152,18 +171,21 @@ example_data_with_row_col %>% ppa(x, y, z, 'line', rowgroup=rows, colgroup=cols)
       and you can apply the desired transformation (or continue your
       investigation) from there.
 
-## A few tips and notes
+Here are a transformation you can try (note- don’t forget to name the
+function so that you can access it later!):
 
-1.  Plan to handle NAs in the plotting variables on your end for now.
-    The plots will still render in the presence of NAs, but data in a 
-    tibble that comes after an NA will not be plotted (so you may be left
-    with only a portion of the plot).  When working inside the app, the main
-    place this will matter is when using the "Transform Panels" functionality.
-    Note that you can take care of NAs inside the transform function, so you
-    need not avoid transformations that will produce NAs (i.e. a lag function
-    or similar).  I plan to work on this for future updates.
-2.  Have a set of score/compare/transform functions that you know a prior you 
-    would like to use but don't want to re-type them into the
-    function input boxes?  No problem!  Just make sure they are in your environment
-    when you launch the app, and write a wrapper function for them in the input boxes
-    in the app!
+``` r
+panel_data %>% mutate(y=y^2)
+```
+
+Go ahead, try a few! Try to chain them together in different ways and
+navigate through the various transformations to get a feel for using the
+navigation tree.
+
+## Tip
+
+Have a set of score/compare/transform functions that you know a prior
+you would like to use but don’t want to re-type them into the function
+input boxes? No problem! Just make sure they are in your environment
+when you launch the app, and write a wrapper function for them in the
+input boxes in the app!
