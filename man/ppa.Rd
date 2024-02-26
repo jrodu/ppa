@@ -25,9 +25,11 @@ ppa(
 
 \item{y}{(required) variable name to be mapped to the y axis}
 
-\item{panel}{(required) variable that indicates the specific panel to which data belong}
+\item{panel}{(required) variable that indicates the specific panel to which
+data belong}
 
-\item{plottype}{currently either 'line' (default) or 'scatter' which defines the plot type}
+\item{plottype}{currently either 'line' (default) or 'scatter' which defines
+the plot type}
 
 \item{rowgroup}{variable that groups panels by row if applicable}
 
@@ -35,8 +37,8 @@ ppa(
 
 \item{randomize}{currently unused}
 
-\item{grid}{tibble with columns ROW, COL, and the 'panel' variable which allows for
-a customized grid}
+\item{grid}{tibble with columns ROW, COL, and the 'panel' variable which
+allows for a customized grid}
 
 \item{session_name}{name for the session}
 

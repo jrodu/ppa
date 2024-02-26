@@ -24,7 +24,8 @@ get_the_grid(
 
 \item{setup_grid}{pre existing or user-supplied grid}
 
-\item{force_grid}{is there a specific format for the grid (e.g. number of columns)}
+\item{force_grid}{is there a specific format for the
+grid (e.g. number of columns)}
 }
 \description{
 Establishes axes locations for panels and selection rectangles

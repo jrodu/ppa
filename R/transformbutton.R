@@ -3,7 +3,6 @@
 #'
 #' @param id id for module
 #'
-#' @importFrom magrittr %>%
 #'
 #'
 transformbuttonUI <- function(id) {
@@ -11,8 +10,11 @@ transformbuttonUI <- function(id) {
   ns <- shiny::NS(id)
 
   shiny::tagList(
-    shiny::selectizeInput(ns("transformbyfunction"), label=NULL, choices=character(), selected = NULL, multiple = FALSE,
-                          options = list(placeholder="select transform function"))
+    shiny::selectizeInput(ns("transformbyfunction"),
+                          label=NULL, choices=character(), selected = NULL,
+                          multiple = FALSE,
+                          options = list(
+                            placeholder="select transform function"))
   )
 
 }
@@ -30,7 +32,10 @@ transformbuttonServer <- function(id, pipeline_variables) {
     shiny::observe({
 
       gargoyle::watch("transform_selectize_update")
-      shiny::updateSelectizeInput(session, inputId = "transformbyfunction", choices=pipeline_variables$transform_functions$name, selected=character())
+      shiny::updateSelectizeInput(
+        session, inputId = "transformbyfunction",
+        choices=pipeline_variables$transform_functions$name,
+        selected=character())
 
 
     })

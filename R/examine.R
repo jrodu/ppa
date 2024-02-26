@@ -3,7 +3,6 @@
 #'
 #' @param id id for module
 #'
-#' @importFrom magrittr %>%
 #'
 examineUI <- function(id) {
 
@@ -12,7 +11,8 @@ examineUI <- function(id) {
   uiOutput(ns("examine"))
   # shiny::tagList(shiny::tags$h4("Examine panels more closely"),
   #                shiny::tags$p("Select panels and click 'Examine selected' to
-  #                              isolate and study them.  Click 'Return to all panels'
+  #                              isolate and study them.
+  #                   Click 'Return to all panels'
   #                              to go back"),
   #   shiny::actionButton(ns("isolateSelected"), "Examine Selected"),
   #   shiny::actionButton(ns("unSelect"), "Return to all panels")
@@ -34,11 +34,13 @@ examineServer <- function(id, pipeline_variables) {
     output$examine <- shiny::renderUI(
 
       shiny::tagList(shiny::tags$h4("Examine panels more closely"),
-                     shiny::tags$p("Select panels and click 'Examine selected' to
-                               isolate and study them.  Click 'Return to all panels'
-                               to go back"),
-                     shiny::actionButton(ns("isolateSelected"), "Examine Selected"),
-                     shiny::actionButton(ns("unSelect"), "Return to all panels"),
+                     shiny::tags$p("Select panels and click 'Examine selected'
+                        to isolate and study them.  Click 'Return to all panels'
+                        to go back"),
+                     shiny::actionButton(ns("isolateSelected"),
+                                         "Examine Selected"),
+                     shiny::actionButton(ns("unSelect"),
+                                         "Return to all panels"),
                      shiny::hr()
       )
 
@@ -46,7 +48,9 @@ examineServer <- function(id, pipeline_variables) {
 
 
     shiny::observeEvent(input$isolateSelected, {
-      pipeline_variables$isolate_panels <- setdiff(pipeline_variables$df_main$panel_string, pipeline_variables$selected_state)
+      pipeline_variables$isolate_panels <- setdiff(
+        pipeline_variables$df_main$panel_string,
+        pipeline_variables$selected_state)
       pipeline_variables$shift_data()
       pipeline_variables$trigger_tmpnewdat()
       gargoyle::trigger("send_to_panel_plot")

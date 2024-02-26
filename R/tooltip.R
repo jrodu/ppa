@@ -1,6 +1,7 @@
 #' Create a bootstrap tooltip
 #' Copied from RLumShiny package
-#' Create bootstrap tooltips for any HTML element to be used in shiny applications.
+#' Create bootstrap tooltips for any HTML element to be used in
+#' shiny applications.
 #'
 #' @param refId [`character`] (**required**):
 #' id of the element the tooltip is to be attached to.
@@ -54,7 +55,8 @@ tooltip <- function(
           sprintf("$(window).load(function(){ $(%s).tooltip({ html: %s,
                   trigger: '%s', title: '%s', animation: %s, delay:
                   {'show': %i, 'hide': %i}, placement: '%s' }); })",
-                  el, tolower(html), trigger, text, tolower(animation), delay, delay, placement)
+                  el, tolower(html), trigger, text, tolower(animation),
+                  delay, delay, placement)
         )
       )
     )

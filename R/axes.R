@@ -1,5 +1,4 @@
 #' UI for axes module
-#' @importFrom magrittr %>%
 #'
 #' @param id module id
 #'
@@ -30,10 +29,23 @@ axesServer <- function(id, pipeline_variables) {
           #selector = paste0("#", ns("putaxes")),
           #where = "beforeBegin",
           shiny::tagList(
-            shinyjs::disabled(shiny::selectInput(ns("xvalueselect"), "X Variable", choices=names(pipeline_variables$df_main), selected = pipeline_variables$var1, multiple = FALSE)),
-            shinyjs::disabled(shiny::selectInput(ns("yvalueselect"), "Y Variable", choices=names(pipeline_variables$df_main), selected = pipeline_variables$var2, multiple = FALSE)),
-            shiny::tags$p(paste0("All variables in data frame: ", base::toString(varnames))),
-            shiny::selectInput(ns("plottype"), "Plot Type", choices=c("scatter", "line"), selected =pipeline_variables$plot_type, multiple = FALSE),
+            shinyjs::disabled(shiny::selectInput(ns("xvalueselect"),
+                            "X Variable",
+                            choices=names(pipeline_variables$df_main),
+                            selected = pipeline_variables$var1,
+                            multiple = FALSE)),
+            shinyjs::disabled(shiny::selectInput(ns("yvalueselect"),
+                            "Y Variable",
+                            choices=names(pipeline_variables$df_main),
+                            selected = pipeline_variables$var2,
+                            multiple = FALSE)),
+            shiny::tags$p(paste0("All variables in data frame: ",
+                                 base::toString(varnames))),
+            shiny::selectInput(ns("plottype"),
+                               "Plot Type",
+                               choices=c("scatter", "line"),
+                               selected =pipeline_variables$plot_type,
+                               multiple = FALSE),
 
             shiny::actionButton(ns("updatevariables"), "update plot type"),
             shiny::hr()
@@ -86,8 +98,8 @@ axesServer <- function(id, pipeline_variables) {
                                   message = input$plottype)
 
         session$sendCustomMessage(type = "data",
-                                  message = list(lines = jsonlite::toJSON(pipeline_variables$newdat),
-                                                 centers = jsonlite::toJSON(pipeline_variables$centers)))
+            message = list(lines = jsonlite::toJSON(pipeline_variables$newdat),
+            centers = jsonlite::toJSON(pipeline_variables$centers)))
         gargoyle::trigger("push_to_tree")
 
       }, ignoreInit = TRUE)

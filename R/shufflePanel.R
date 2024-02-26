@@ -3,7 +3,6 @@
 #'
 #' @param id id for module
 #'
-#' @importFrom magrittr %>%
 #'
 #'
 shufflePanelUI <- function(id) {
@@ -31,7 +30,9 @@ shufflePanelServer <- function(id, pipeline_variables) {
       #where = "beforeBegin",
       shiny::tagList(
         shiny::tags$h4("Shuffle panels"),
-        shiny::tags$p("Select the appropriate button to randomize the order of the panels."),
+        shiny::tags$p(
+          "Select the appropriate button to randomize
+          the order of the panels."),
         shiny::actionButton(ns("row"), "Shuffle Rows"),
         shiny::actionButton(ns("col"), "Shuffle Columns"),
         shiny::actionButton(ns("both"), "Shuffle Rows and Columns"),
@@ -42,28 +43,32 @@ shufflePanelServer <- function(id, pipeline_variables) {
 
     shiny::observeEvent(input$row, {
       pipeline_variables$force_grid <- TRUE
-      pipeline_variables$setup_grid <- shuffle_row(pipeline_variables$setup_grid)
+      pipeline_variables$setup_grid <- shuffle_row(
+        pipeline_variables$setup_grid)
       pipeline_variables$trigger_newdat()
       gargoyle::trigger("send_to_panel_plot")
     }, ignoreInit = TRUE)
 
     shiny::observeEvent(input$col, {
       pipeline_variables$force_grid <- TRUE
-      pipeline_variables$setup_grid <- shuffle_col(pipeline_variables$setup_grid)
+      pipeline_variables$setup_grid <- shuffle_col(
+        pipeline_variables$setup_grid)
       pipeline_variables$trigger_newdat()
       gargoyle::trigger("send_to_panel_plot")
     }, ignoreInit = TRUE)
 
     shiny::observeEvent(input$both, {
       pipeline_variables$force_grid <- TRUE
-      pipeline_variables$setup_grid <- shuffle_rowcol(pipeline_variables$setup_grid)
+      pipeline_variables$setup_grid <- shuffle_rowcol(
+        pipeline_variables$setup_grid)
       pipeline_variables$trigger_newdat()
       gargoyle::trigger("send_to_panel_plot")
     }, ignoreInit = TRUE)
 
     shiny::observeEvent(input$shufflepanels, {
       pipeline_variables$force_grid <- TRUE
-      pipeline_variables$setup_grid <- shuffle_panel(pipeline_variables$setup_grid)
+      pipeline_variables$setup_grid <- shuffle_panel(
+        pipeline_variables$setup_grid)
       pipeline_variables$trigger_newdat()
       gargoyle::trigger("send_to_panel_plot")
     }, ignoreInit = TRUE)

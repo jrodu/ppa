@@ -11,7 +11,8 @@ setup_grid_groups(x, maxcol, force_grid = FALSE)
 
 \item{maxcol}{maximal columns allowed}
 
-\item{force_grid}{TRUE if number of columns should not be derived from the number of panels}
+\item{force_grid}{TRUE if number of columns should not be derived
+from the number of panels}
 }
 \description{
 Place panels in grid

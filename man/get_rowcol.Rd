@@ -9,14 +9,17 @@ get_rowcol(dat, rowgroup, colgroup, panelgroup, randomize = "none")
 \arguments{
 \item{dat}{data being plotted}
 
-\item{rowgroup}{if applicable, the variable that identifies the row for a panel}
+\item{rowgroup}{if applicable, the variable that identifies the row
+for a panel}
 
-\item{colgroup}{if applicable, the variable that identifies the column for a panel}
+\item{colgroup}{if applicable, the variable that identifies the
+column for a panel}
 
 \item{panelgroup}{variable that specifies the panel a datapoint belongs to}
 
 \item{randomize}{whether the grid should be randomized, "none" (default)
-"rows", "cols", "both", or "panels" (breaks association with row/col)}
+"rows", "cols", "both", or "panels" (breaks association
+with row/col)}
 }
 \value{
 a tibble containing row and column assignment for each panel

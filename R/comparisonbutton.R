@@ -3,7 +3,6 @@
 #'
 #' @param id id for module
 #'
-#' @importFrom magrittr %>%
 #'
 #'
 comparisonbuttonUI <- function(id) {
@@ -11,8 +10,11 @@ comparisonbuttonUI <- function(id) {
   ns <- shiny::NS(id)
 
   shiny::tagList(
-    shiny::selectizeInput(ns("comparisonbyvalue"), label=NULL, choices=character(), selected = NULL, multiple = FALSE,
-                          options = list(placeholder="select comparison function"))
+    shiny::selectizeInput(ns("comparisonbyvalue"),
+                          label=NULL, choices=character(), selected = NULL,
+                          multiple = FALSE,
+                          options = list(
+                            placeholder="select comparison function"))
   )
 
 }
@@ -29,7 +31,10 @@ comparisonbuttonServer <- function(id, pipeline_variables) {
     shiny::observe({
 
       gargoyle::watch("compare_selectize_update")
-      shiny::updateSelectizeInput(session, inputId = "comparisonbyvalue", choices=pipeline_variables$filter_selection_functions$name, selected=character())
+      shiny::updateSelectizeInput(
+        session, inputId = "comparisonbyvalue",
+        choices=pipeline_variables$filter_selection_functions$name,
+        selected=character())
 
     })
 

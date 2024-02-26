@@ -4,7 +4,8 @@
 \alias{tooltip}
 \title{Create a bootstrap tooltip
 Copied from RLumShiny package
-Create bootstrap tooltips for any HTML element to be used in shiny applications.}
+Create bootstrap tooltips for any HTML element to be used in
+shiny applications.}
 \usage{
 tooltip(
   refId,
@@ -49,5 +50,6 @@ You may pass multiple triggers; separate them with a space.}
 \description{
 Create a bootstrap tooltip
 Copied from RLumShiny package
-Create bootstrap tooltips for any HTML element to be used in shiny applications.
+Create bootstrap tooltips for any HTML element to be used in
+shiny applications.
 }

@@ -6,7 +6,6 @@
 #' @param y variable mapped to y axis
 #' @param key variable associated with the panel
 #'
-#' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom rlang :=
 #'
@@ -35,15 +34,18 @@ get_plot_vals <- function(data, x, y, key){
                                     xmin = min_na(as.numeric(!!x)),
                                     xmax = max_na(as.numeric(!!x))))
 
-  data <- data %>%  #for now, assume 1 y variable under consideration, but see earo for modifying
+  data <- data %>%  #for now, assume 1 y variable under consideration, but see
+    # earo for modifying
     dplyr::mutate(!!.y := normalise(as.numeric(!!y),
                                     xmin = min_na(as.numeric(!!y)),
                                     xmax = max_na(as.numeric(!!y))))
 
-  data <- data %>% dplyr::mutate(dotx = !!rlang::sym(.x), doty = !!rlang::sym(.y))%>%
-    dplyr::mutate(panel_string = !!key) %>% dplyr::mutate(panel_string=as.character(panel_string)) #make sure the panel string works.
+  data <- data %>%
+    dplyr::mutate(dotx = !!rlang::sym(.x), doty = !!rlang::sym(.y))%>%
+    dplyr::mutate(panel_string = !!key) %>%
+    dplyr::mutate(panel_string=as.character(panel_string))
 
-  data %>% drop_na(dotx, doty)
+  data %>% tidyr::drop_na(dotx, doty)
 
 }
 
@@ -54,12 +56,13 @@ get_plot_vals <- function(data, x, y, key){
 #' @param width panel dimension
 #' @param height panel dimension
 #' @param setup_grid pre existing or user-supplied grid
-#' @param force_grid is there a specific format for the grid (e.g. number of columns)
+#' @param force_grid is there a specific format for the
+#'          grid (e.g. number of columns)
 #'
 #'
-get_the_grid <- function(x, maxcol=30, width=.8, height=.8, setup_grid = NA, force_grid = FALSE){
+get_the_grid <- function(x, maxcol=30, width=.8, height=.8,
+                         setup_grid = NA, force_grid = FALSE){
 
-  #for now, x can either be the long list of panels repeated, or just a unique list
   if(length(setup_grid) !=3){
     setup_grid <- setup_grid_groups(x, maxcol, force_grid)
   }
@@ -76,16 +79,21 @@ get_the_grid <- function(x, maxcol=30, width=.8, height=.8, setup_grid = NA, for
   #print(grids)
 
   rgrid <- setup_grid %>%
-    dplyr::left_join(grids, by = c("COL", "ROW")) %>% dplyr::mutate(dotcx = .data$.cx, dotcy=.data$.cy)
+    dplyr::left_join(grids, by = c("COL", "ROW")) %>%
+    dplyr::mutate(dotcx = .data$.cx, dotcy=.data$.cy)
   # save(rgrid, file="tmp.rda")
   rgrid
 }
 
 get_new_plot_vals <- function(olddata, scoresdata){
   #print(olddata)
-  olddata %>% dplyr::select(-c(.data$use_pos, .data$use_score)) %>% dplyr::left_join(scoresdata, by="panel_string") %>%
-    dplyr::mutate(dotcx = (.data$scorex-min(.data$scorex))/(max(.data$scorex)-min(.data$scorex)),
-           dotcy = (.data$scorey-min(.data$scorey))/(max(.data$scorey)-min(.data$scorey)))
+  olddata %>% dplyr::select(-c(.data$use_pos, .data$use_score)) %>%
+    dplyr::left_join(scoresdata, by="panel_string") %>%
+    dplyr::mutate(
+      dotcx = (.data$scorex-min(.data$scorex))/
+                      (max(.data$scorex)-min(.data$scorex)),
+      dotcy = (.data$scorey-min(.data$scorey))/
+                      (max(.data$scorey)-min(.data$scorey)))
 }
 
 
@@ -98,8 +106,8 @@ get_new_plot_vals <- function(olddata, scoresdata){
 #' @param width width of panel
 #' @param height height of panel
 #'
-get_centers_with_bounds <- function(data, scores,
-                                    width_factor = 1, height_factor=1, width=NULL, height=NULL){
+get_centers_with_bounds <- function(
+    data, scores, width_factor = 1, height_factor=1, width=NULL, height=NULL){
   .x1 <- NULL
   .x2 <- NULL
   .y1 <- NULL
@@ -112,10 +120,14 @@ get_centers_with_bounds <- function(data, scores,
   }
 
 
-  data %>% dplyr::select(.data$ROW, .data$COL, .data$PANEL, .data$.cx, .data$.cy) %>% dplyr::distinct() %>%
+  data %>%
+    dplyr::select(.data$ROW, .data$COL, .data$PANEL, .data$.cx, .data$.cy) %>%
+    dplyr::distinct() %>%
     dplyr::mutate(.x1=.data$.cx, .y1=.data$.cy,
-           .x2=.data$.cx+width, .y2=.data$.cy+height, width=width, height=height) %>%
-    dplyr::mutate(dotx1 = .x1, dotx2=.x2, doty1=.y1, doty2=.y2, dotcx=.data$.cx, dotcy=.data$.cy) %>%
+      .x2=.data$.cx+width, .y2=.data$.cy+height,
+      width=width, height=height) %>%
+    dplyr::mutate(dotx1 = .x1, dotx2=.x2, doty1=.y1,
+                  doty2=.y2, dotcx=.data$.cx, dotcy=.data$.cy) %>%
     dplyr::mutate(panel_string = as.character(.data$PANEL))
 
 
@@ -131,14 +143,19 @@ get_centers_dist <- function(centers, width, height){
   new_cx <- NULL
   new_cy <- NULL
   pstring <- centers %>% dplyr::select(.data$panel_string)
-  new_cent <- centers %>% dplyr::mutate(new_cx = .data$dotcx + width/2, new_cy = .data$dotcy + height/2) %>% dplyr::select(new_cx, new_cy)
+  new_cent <- centers %>%
+    dplyr::mutate(
+      new_cx = .data$dotcx + width/2, new_cy = .data$dotcy + height/2) %>%
+    dplyr::select(new_cx, new_cy)
   xdist <- (as.matrix(stats::dist(new_cent$new_cx, upper=TRUE))<width)*1
   ydist <- (as.matrix(stats::dist(new_cent$new_cy, upper=TRUE))<height)*1
-  tibble::tibble(panel_string = as.vector(pstring$panel_string), num_overlap = rowSums(xdist*ydist))
+  tibble::tibble(panel_string = as.vector(pstring$panel_string),
+                 num_overlap = rowSums(xdist*ydist))
 }
 
 
-#copied with modification from https://github.com/earowang/sugrrants/blob/master/R/frame-calendar.R
+#copied with modification from
+#https://github.com/earowang/sugrrants/blob/master/R/frame-calendar.R
 
 
 
@@ -246,17 +263,15 @@ normalise <- function(x, xmin = NULL, xmax = NULL) {
 #'
 #' @param x vector of panels
 #' @param maxcol maximal columns allowed
-#' @param force_grid TRUE if number of columns should not be derived from the number of panels
+#' @param force_grid TRUE if number of columns should not be derived
+#'          from the number of panels
 #'
 setup_grid_groups <- function(x, maxcol, force_grid = FALSE){
 
   #x says which panel a datapoint belongs to
   x <- unique(x)
   numx <- length(x)
-  #for now, assume that you don't go over the max number, but need to handle this eventually.
-  #probably will create "lists" of frames with essentially a recursive call to setup_grid_groups.
 
-  #try to get as close to square as possible... user can modify by fussing around with max numbers
 
   if(force_grid){
     numcol <- maxcol
@@ -287,7 +302,7 @@ get_comparison_scores <- function(df, panel, fn){
   data <- NULL
   score <- NULL
   tmp_df <- df %>% dplyr::group_by(.data$panel_string) %>% tidyr::nest()
-  comp_df <- df %>% dplyr::filter(.data$panel_string %in% panel) #%>% rename(x_selected = x, y_selected = y)
+  comp_df <- df %>% dplyr::filter(.data$panel_string %in% panel)
   wrapped_fn <- function(panel_selected){
     function(panel_data){
       fn(panel_data, panel_selected)
@@ -296,7 +311,8 @@ get_comparison_scores <- function(df, panel, fn){
 
   tmp_fn <- wrapped_fn(comp_df)
 
-  tmp_df %>% dplyr::mutate(score=purrr::map(data, tmp_fn)) %>% tidyr::unnest(cols=c(score)) %>% dplyr::select(score, .data$panel_string)
+  tmp_df %>% dplyr::mutate(score=purrr::map(data, tmp_fn)) %>%
+    tidyr::unnest(cols=c(score)) %>% dplyr::select(score, .data$panel_string)
 }
 
 #' Compute scores from user supplied function
@@ -313,9 +329,13 @@ get_value_scores <- function(data, fn1, fn2=NULL){
   scorey <- NULL
   tmp_data <- data %>% dplyr::group_by(.data$panel_string) %>% tidyr::nest()
   if(is.null(fn2)){
-    tmp_data %>% dplyr::mutate(score=purrr::map(data, fn1)) %>% tidyr::unnest(cols=score)
+    tmp_data %>% dplyr::mutate(score=purrr::map(data, fn1)) %>%
+      tidyr::unnest(cols=score)
   } else {
-    tmp_data %>% dplyr::mutate(scorex=purrr::map(data, fn1), scorey=purrr::map(data, fn2)) %>% tidyr::unnest(cols=c(scorex, scorey))
+    tmp_data %>%
+      dplyr::mutate(scorex=purrr::map(data, fn1),
+                    scorey=purrr::map(data, fn2)) %>%
+      tidyr::unnest(cols=c(scorex, scorey))
   }
 }
 
@@ -331,7 +351,8 @@ get_value_scores <- function(data, fn1, fn2=NULL){
 transform_data <- function(data, transformfn){
   newdat <- NULL
   tmp_data <- data %>% dplyr::group_by(.data$panel_string) %>% tidyr::nest()
-  tmp_data %>% dplyr::mutate(newdat=purrr::map(data, transformfn)) %>% dplyr::select(-data) %>% tidyr::unnest(cols=newdat) %>%
+  tmp_data %>% dplyr::mutate(newdat=purrr::map(data, transformfn)) %>%
+    dplyr::select(-data) %>% tidyr::unnest(cols=newdat) %>%
     dplyr::ungroup()
 }
 
@@ -346,7 +367,8 @@ transform_data <- function(data, transformfn){
 get_parent_chain <- function(tree, node){
   involved_parents <- c(node)
   while(node>1){
-    node <- tree %>% dplyr::filter(.data$id==node) %>% dplyr::select(.data$parentId) %>% as.integer()
+    node <- tree %>% dplyr::filter(.data$id==node) %>%
+      dplyr::select(.data$parentId) %>% as.integer()
     involved_parents <- c(node, involved_parents)
   }
   involved_parents
@@ -360,7 +382,8 @@ get_parent_chain <- function(tree, node){
 #' @return series of transform functions
 #'
 get_reconstruction_chain <- function(tree, parent_chain){
-  tree %>% dplyr::filter(.data$id %in% parent_chain) %>% dplyr::arrange(.data$id)
+  tree %>% dplyr::filter(.data$id %in% parent_chain) %>%
+    dplyr::arrange(.data$id)
 }
 
 #' Takes series of transformations and applies them to the data
@@ -376,7 +399,7 @@ apply_reconstruction <- function(tree, data){
     data
   } else{
     tree <- tree %>% dplyr::filter(.data$id>1)
-    for(i in 1:nrow(tree)){
+    for(i in seq_along(tree)){
       tmp_branch <- tree[i,]
       if(tmp_branch$type=="transform"){
         fn_txt_tmp <- tmp_branch$expression1
@@ -400,7 +423,8 @@ get_ancestors <- function(index, data){
   if(index==1){
     1
   }else{
-    parentid <- data %>% dplyr::filter(.data$id==index) %>% dplyr::select(.data$parentId) %>% as.numeric()
+    parentid <- data %>% dplyr::filter(.data$id==index) %>%
+      dplyr::select(.data$parentId) %>% as.numeric()
     c(get_ancestors(parentid, data), index)
   }
 }

@@ -4,7 +4,7 @@
 \alias{expand.grid2}
 \title{wrapper for expand grid}
 \usage{
-\method{expand}{grid2}(...)
+expand.grid2(...)
 }
 \arguments{
 \item{...}{variables passed to expand grid}

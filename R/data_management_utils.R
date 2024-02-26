@@ -1,11 +1,14 @@
 #' Create grid layout for panels
 #'
 #' @param dat data being plotted
-#' @param rowgroup if applicable, the variable that identifies the row for a panel
-#' @param colgroup if applicable, the variable that identifies the column for a panel
+#' @param rowgroup if applicable, the variable that identifies the row
+#'                  for a panel
+#' @param colgroup if applicable, the variable that identifies the
+#'                  column for a panel
 #' @param panelgroup variable that specifies the panel a datapoint belongs to
 #' @param randomize whether the grid should be randomized, "none" (default)
-#'                  "rows", "cols", "both", or "panels" (breaks association with row/col)
+#'                  "rows", "cols", "both", or "panels" (breaks association
+#'                  with row/col)
 #'
 #' @return a tibble containing row and column assignment for each panel
 #'
@@ -179,9 +182,12 @@ save_vars <- function(pipe_vars, session_name){
 
   if(nrow(pipe_vars$tree)>1) varlist$workflow_tree <- pipe_vars$tree
 
-  if(nrow(pipe_vars$filter_selection_functions)>0) varlist$comparison_functions <- pipe_vars$filter_selection_functions
-  if(nrow(pipe_vars$filter_value_functions)>0) varlist$score_functions <- pipe_vars$filter_value_functions
-  if(nrow(pipe_vars$transform_functions)>0) varlist$transform_functions <- pipe_vars$transform_functions
+  if(nrow(pipe_vars$filter_selection_functions)>0){
+    varlist$comparison_functions <- pipe_vars$filter_selection_functions}
+  if(nrow(pipe_vars$filter_value_functions)>0){
+    varlist$score_functions <- pipe_vars$filter_value_functions}
+  if(nrow(pipe_vars$transform_functions)>0){
+    varlist$transform_functions <- pipe_vars$transform_functions}
 
   if(!is.null(pipe_vars$hide_panels)){
     varlist$excluded_panels <- pipe_vars$hide_panels

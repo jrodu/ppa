@@ -4,21 +4,22 @@
 #'
 #' @param x (required) variable name to be mapped to the x axis
 #' @param y (required) variable name to be mapped to the y axis
-#' @param panel (required) variable that indicates the specific panel to which data belong
-#' @param plottype currently either 'line' (default) or 'scatter' which defines the plot type
+#' @param panel (required) variable that indicates the specific panel to which
+#'              data belong
+#' @param plottype currently either 'line' (default) or 'scatter' which defines
+#'              the plot type
 #' @param rowgroup variable that groups panels by row if applicable
 #' @param colgroup variable that groups panels by column if applicable
 #' @param randomize currently unused
-#' @param grid tibble with columns ROW, COL, and the 'panel' variable which allows for
-#'              a customized grid
+#' @param grid tibble with columns ROW, COL, and the 'panel' variable which
+#'              allows for a customized grid
 #' @param session_name name for the session
 #' @param ... additional variables to be passed on
 #'
 #' @export
 #'
-#' @importFrom magrittr %>%
-
-ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = NA, grid = NULL,session_name="ppa",...) {
+ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup,
+                randomize = NA, grid = NULL,session_name="ppa",...) {
   x <- rlang::enquo(x)
   y <- rlang::enquo(y)
   panel <- rlang::enquo(panel)
@@ -47,7 +48,8 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     } else{
       use_col <- TRUE
       colgroup <- rlang::enquo(colgroup)
-      grid <- mydata %>% get_rowcol(rowgroup=!!rowgroup, colgroup=!!colgroup, panelgroup=!!panel)
+      grid <- mydata %>% get_rowcol(rowgroup=!!rowgroup, colgroup=!!colgroup,
+                                    panelgroup=!!panel)
     }
   }
 
@@ -73,23 +75,27 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
     shiny::tags$head(
       shiny::tags$style(shiny::HTML("hr {border-top: 1px solid #000000;}"))
     ),
-    shiny::fluidRow(shiny::column(9, style='border-right:1px solid grey;padding-bottom:50px',
-                           shiny::tags$script(src='https://d3js.org/d3.v6.min.js'),
+    shiny::fluidRow(shiny::column(9,
+                      style='border-right:1px solid grey;padding-bottom:50px',
+                      shiny::tags$script(src='https://d3js.org/d3.v6.min.js'),
    panelsUI("mainpanel")),
   shiny::column(3, style='padding-top:30px;',
 
 
                 #shiny::tags$h4("Panel Settings"),
   ###### axes
-  shiny::tags$p("Select up to 3 at a time. 'Score' and 'Comparison' cannot be selected simultaneously."),
+  shiny::tags$p("Select up to 3 at a time. 'Score' and 'Comparison' cannot
+                be selected simultaneously."),
   shiny::checkboxInput("viewVariables", "Individual Panel Settings", FALSE),
   #tooltip("viewVariables", "tooltip tester"),
   shiny::checkboxInput("viewShuffle", "Panel Shufflers", FALSE),
   shiny::checkboxInput("viewSelectors", "Panel Selection Actions", FALSE),
   shiny::checkboxInput("excludePanels", "Exclude/Unexclude Panels", FALSE),
   #shiny::checkboxInput("examinePanels", "Examine Panels", FALSE),
-  shiny::checkboxInput("labelPanels", "Label Panels and Select by Label", FALSE),
-  shiny::checkboxInput("scorePanels", "Select Panels by a Score Function", FALSE),
+  shiny::checkboxInput("labelPanels",
+                       "Label Panels and Select by Label", FALSE),
+  shiny::checkboxInput("scorePanels",
+                       "Select Panels by a Score Function", FALSE),
   shiny::checkboxInput("comparePanels", "Select Panels by Comparison", FALSE),
   shiny::checkboxInput("placePanels", "Arrange Panels in Scatter Plot", FALSE),
   shiny::checkboxInput("transformPanels", "Transform Panels", FALSE),
@@ -114,7 +120,8 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
   server <- function(input, output, session) {
     gargoyle::init("print_debug", "send_to_panel_plot",
                    "filter_one", "push_to_tree", "filter_chain",
-                   "save_session", "update_variables", "set_variables", "compare_selectize_update",
+                   "save_session", "update_variables", "set_variables",
+                   "compare_selectize_update",
                    "filter_selectize_update", "transform_selectize_update")
 
     shiny::onStop(function() {
@@ -124,6 +131,7 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
       # file.remove("tmp_save_variables.rda")
       keepvars <- save_vars(pipeline_variables, session_name)
       base::list2env(keepvars, .GlobalEnv)
+      shiny::stopApp()
       })
 
     output$modules <- reactive({
@@ -164,7 +172,8 @@ ppa <- function(mydata, x, y, panel, plottype, rowgroup, colgroup, randomize = N
 
 
     maxchecks <- function(){
-      totchecked <- input$viewVariables + input$viewShuffle + input$viewSelectors +
+      totchecked <- input$viewVariables + input$viewShuffle +
+        input$viewSelectors +
         input$excludePanels + input$labelPanels + input$scorePanels +
         input$comparePanels + input$placePanels + input$transformPanels
       if(totchecked==3){

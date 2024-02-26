@@ -3,7 +3,6 @@
 #'
 #' @param id id for module
 #'
-#' @importFrom magrittr %>%
 #'
 #'
 panelsUI <- function(id) {
@@ -13,7 +12,8 @@ panelsUI <- function(id) {
    shiny::fluidRow(shiny::column(12,
 
   shiny::tagList(
-    shiny::tags$head(shiny::tags$style(shiny::HTML(paste0("#", ns("tooltip"), " {
+    shiny::tags$head(
+    shiny::tags$style(shiny::HTML(paste0("#", ns("tooltip"), " {
             position: absolute;
             width: auto;
             height: auto;
@@ -79,7 +79,8 @@ panelsServer <- function(id, pipeline_variables) {
            id = ns("d3_output"),
            class="svg-container",
            style =
-             paste0("width: 100%;height:",height_ratio()*1000,"px;padding-top: 50px")
+             paste0("width: 100%;height:",
+                    height_ratio()*1000,"px;padding-top: 50px")
          ),
          shiny::tags$div(
            id = ns("tooltip"),
@@ -128,24 +129,28 @@ panelsServer <- function(id, pipeline_variables) {
     )
 
      observeEvent(input$panelproperties, {
-       shinyalert::shinyalert(html = TRUE,
-                              closeOnEsc = TRUE,
-                              closeOnClickOutside = TRUE,
-                              showConfirmButton = FALSE,text = tagList(
-                                  shiny::numericInput(ns("numcol"), "number of columns",
-                                        value = max(pipeline_variables$setup_grid$COL), min = 0, max = 100),
-                                  shiny::numericInput(ns("multiplier"), "change vertical size",
-                                        value = isolate(height_ratio()), min = 0, max = 100),
-                                  shiny::actionButton(ns("updatepanels"), "update panels")
+       shinyalert::shinyalert(
+         html = TRUE,
+         closeOnEsc = TRUE,
+         closeOnClickOutside = TRUE,
+         showConfirmButton = FALSE,
+         text = tagList(
+           shiny::numericInput(ns("numcol"), "number of columns",
+           value = max(pipeline_variables$setup_grid$COL), min = 0, max = 100),
+           shiny::numericInput(
+             ns("multiplier"), "change vertical size",
+             value = isolate(height_ratio()), min = 0, max = 100),
+             shiny::actionButton(ns("updatepanels"), "update panels")
                                 ))
 
      }, ignoreInit = TRUE)
 
     # #
     session$onFlushed(function() {
-     session$sendCustomMessage(type = "data",
-                               message = list(lines = jsonlite::toJSON(pipeline_variables$newdat),
-                                              centers = jsonlite::toJSON(pipeline_variables$centers)))
+     session$sendCustomMessage(
+       type = "data",
+       message = list(lines = jsonlite::toJSON(pipeline_variables$newdat),
+       centers = jsonlite::toJSON(pipeline_variables$centers)))
 
    })
 
@@ -171,9 +176,10 @@ panelsServer <- function(id, pipeline_variables) {
     shiny::observe(priority=-5, {
       gargoyle::watch("send_to_panel_plot")
 
-      session$sendCustomMessage(type = "data",
-                                message = list(lines = jsonlite::toJSON(pipeline_variables$newdat),
-                                               centers = jsonlite::toJSON(pipeline_variables$centers)))
+      session$sendCustomMessage(
+        type = "data",
+        message = list(lines = jsonlite::toJSON(pipeline_variables$newdat),
+        centers = jsonlite::toJSON(pipeline_variables$centers)))
 
 
     })

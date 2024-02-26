@@ -3,7 +3,6 @@
 #'
 #' @param id id for module
 #'
-#' @importFrom magrittr %>%
 #'
 #'
 filterbuttonUI <- function(id) {
@@ -11,7 +10,8 @@ filterbuttonUI <- function(id) {
   ns <- shiny::NS(id)
 
   shiny::tagList(
-    shiny::selectizeInput(ns("filterbyvalue"), label=NULL, choices=character(), selected = NULL, multiple = FALSE,
+    shiny::selectizeInput(ns("filterbyvalue"), label=NULL, choices=character(),
+                          selected = NULL, multiple = FALSE,
                           options = list(placeholder="select filter function"))
   )
 
@@ -29,7 +29,9 @@ filterbuttonServer <- function(id, pipeline_variables) {
     shiny::observe({
 
       gargoyle::watch("filter_selectize_update")
-      shiny::updateSelectizeInput(session, inputId = "filterbyvalue", choices=pipeline_variables$filter_value_functions$name, selected=character())
+      shiny::updateSelectizeInput(session, inputId = "filterbyvalue",
+                        choices=pipeline_variables$filter_value_functions$name,
+                        selected=character())
 
     })
 

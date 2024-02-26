@@ -13,7 +13,8 @@ A data frame with 5,100 rows and 6 columns:
 \item{series}{time series to which the data belong}
 \item{identity}{group to which the time series belongs}
 \item{y}{y value}
-\item{identity_16, identity_random}{group to which time series belongs under slight corruption and random permutation}
+\item{identity_16, identity_random}{group to which time series belongs
+under slight corruption and random permutation}
 ...
 }
 }
@@ -25,6 +26,7 @@ simulated
 example_data_from_paper
 }
 \description{
-Data intended to show specific issues with currently available visualization tools
+Data intended to show specific issues with currently available
+visualization tools
 }
 \keyword{datasets}
