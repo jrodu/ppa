@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Jordan", "Rodu", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: A usable prototype app for Plot Panel Analysis
+Description: This package contains a usable prototype app for Plot Panel Analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
