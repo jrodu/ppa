@@ -107,5 +107,5 @@
 #'   \item{stance_excursion_mp_to}{}
 #'   ...
 #' }
-#' @source simulated
-"example_data_with_row_col"
+#' @source personal collection from experienced funner
+"running_data"
