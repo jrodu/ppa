@@ -135,7 +135,7 @@ PanelObject <- R6::R6Class("PanelObject",
                                dplyr::mutate(
                                  panel_string = as.character(panel_string)) %>%
                                dplyr::mutate(
-                                 score=0, use_score=0, use_pos=0) %>%
+                                 score=0, use_score=0, use_pos=0, name="none") %>% #need to handle name=none case in updating scores?
                                dplyr::select(-!!self$panel_name)
                              invisible(self)
                            },
@@ -162,6 +162,7 @@ PanelObject <- R6::R6Class("PanelObject",
       left_join(self$filtereddf %>%
                   select(panel_string, score) %>%
                   rename({{score_name}}:= score), by=join_by(panel_string))
+    print(self$scores)
     invisible(self)
   },
                            reset_filter_criterion = function(){

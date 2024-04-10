@@ -85,6 +85,7 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
       #           options = list(placeholder="select comparison function")),
       shiny::actionButton(ns("edit_comparison"), "Edit"),
       shiny::actionButton(ns("filterSelection"), "Select by Comparison"),
+      shiny::actionButton(ns("saveScores"), "Save Scores"),
       #### the ecdf plot
       #plotECDFUI(ns("ecdf")),
       # shiny::br(),
@@ -152,7 +153,9 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
       }else{
 
       if(is.null(errorhandle)){
-        tryCatch(tmp_try <- get_comparison_scores(
+        base_panel <- pipeline_variables$cur_selection
+        tryCatch(
+            tmp_try <- get_comparison_scores(
           pipeline_variables$df_main,
           pipeline_variables$cur_selection, f_compare) %>%
             dplyr::mutate(use_score=1, use_pos=0),
@@ -162,7 +165,7 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
                    errorhandle <<- "throwing some warnings here..."})
 
       if(is.null(errorhandle)){
-      pipeline_variables$filtereddf <- tmp_try
+      pipeline_variables$filtereddf <- tmp_try %>% mutate(name=paste0(compare_fn(), '_', base_panel))
 
       tryCatch(scores <-  pipeline_variables$filtereddf %>%
                  dplyr::filter(
@@ -240,6 +243,16 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
       }
 
     })
+
+    ####### save scores
+
+    shiny::observeEvent(input$saveScores, {
+
+      #if(isTruthy(input$filterselectize)){
+      pipeline_variables$update_scores(pipeline_variables$filtereddf$name %>% unique())
+      #}
+
+    }, ignoreInit = TRUE)
 
     shiny::observeEvent(input$edit_comparison, {
 
