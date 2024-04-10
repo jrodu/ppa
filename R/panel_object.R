@@ -94,7 +94,8 @@ PanelObject <- R6::R6Class("PanelObject",
                                  self$filtereddf, by="panel_string") %>%
                               dplyr::filter(
                                 !panel_string %in% self$hide_panels,
-                                !panel_string %in% self$isolate_panels)
+                                !panel_string %in% self$isolate_panels)%>%
+                               dplyr::mutate(stroke_width=1)
                              if(is.null(self$setup_grid)){
                              self$setup_grid <- self$centers %>%
                                dplyr::select(ROW, COL, panel_string)
@@ -114,7 +115,8 @@ PanelObject <- R6::R6Class("PanelObject",
                                  self$filtereddf, by="panel_string") %>%
                                dplyr::filter(
                                  !panel_string %in% self$hide_panels,
-                                 !panel_string %in% self$isolate_panels)
+                                 !panel_string %in% self$isolate_panels) %>%
+                               dplyr::mutate(stroke_width=1)
 
                              invisible(self)
                            },

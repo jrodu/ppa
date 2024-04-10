@@ -181,7 +181,7 @@ function update_rect(dat) {
       //.attr("fill", function(d) { return myColor(+d.centers.alpha);} )
           .attr("fill", "#808080" )
           .attr("fill-opacity", function() { return (d3.select(this).attr("selected")>0) ? .5 : 0; })
-          .attr("stroke-width", 1)
+          .attr("stroke-width", function(d) { return d.stroke_width; })
           .attr("stroke", "#000000")
           .attr("stroke-opacity", 1)
           .on("mouseover", handleMouseOver)

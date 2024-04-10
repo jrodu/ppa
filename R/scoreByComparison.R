@@ -154,6 +154,7 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
 
       if(is.null(errorhandle)){
         base_panel <- pipeline_variables$cur_selection
+        print(base_panel)
         tryCatch(
             tmp_try <- get_comparison_scores(
           pipeline_variables$df_main,
@@ -181,7 +182,8 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
       new_centers <- pipeline_variables$centers
       new_centers <- new_centers %>% dplyr::select(-.data$score) %>%
         dplyr::left_join(pipeline_variables$filtereddf, by="panel_string") %>%
-        dplyr::mutate(use_score=1)
+        dplyr::mutate(use_score=1) %>% dplyr::mutate(stroke_width = ifelse(panel_string==base_panel, 5, 1))
+      print(new_centers$stroke_width)
 
       shiny::updateTextInput(session, "functionName", value=character())
       shiny::updateTextAreaInput(session, "filtercomp", value=character())
