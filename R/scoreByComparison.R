@@ -256,6 +256,21 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
 
     shiny::observeEvent(input$edit_comparison, {
 
+      if(!isTruthy(compare_fn())) {#check if selectize is null
+        # fn_txt <- paste('f_compare <- function(panel_data, panel_selected)
+        #   {', input$filtercomp, '}', sep='')
+        #
+        # fn_label <- input$functionName
+        # pipeline_variables$filter_selection_functions <-
+        #  pipeline_variables$filter_selection_functions %>%
+        #  dplyr::add_row(name=fn_label, fn=input$filtercomp)
+        errorhandle <- "need to select a function!"
+        shinyalert::shinyalert(
+          paste0("Oops!",
+                 "Make sure to select a function to edit first!"),
+          type = "error")
+      } else{
+
       shinyalert::shinyalert(
         html = TRUE,
         closeOnEsc = TRUE,
@@ -276,6 +291,7 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
                                  ns("submitedcomparisonfunction"),
                                  "confirm edit")
                              ))
+      }
 
     }, ignoreInit = TRUE)
 

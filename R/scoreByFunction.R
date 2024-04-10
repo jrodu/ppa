@@ -207,7 +207,20 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
 
 
     shiny::observeEvent(input$edit_filter, {
-
+      if(!isTruthy(filter_fn())) {#check if selectize is null
+        # fn_txt <- paste('f_compare <-
+        #  function(panel_data) {', input$filterval, '}', sep='')
+        #
+        # fn_label <- input$functionValueName
+        # pipeline_variables$filter_value_functions <-
+        #  pipeline_variables$filter_value_functions %>%
+        #  dplyr::add_row(name=fn_label, fn=input$filterval)
+        errorhandle <- "need to select a function!"
+        shinyalert::shinyalert(
+          paste0("Oops!",
+                 "Make sure to select a function to edit first!"),
+          type = "error")
+      } else{
       shinyalert::shinyalert(
         html = TRUE,
         closeOnEsc = TRUE,
@@ -228,6 +241,7 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
             width="100%", height="300px"), strong("}"),
           shiny::actionButton(ns("submitedfilterfunction"), "confirm edit")
                              ))
+      }
 
     }, ignoreInit = TRUE)
 
