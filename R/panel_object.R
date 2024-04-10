@@ -6,6 +6,7 @@ PanelObject <- R6::R6Class("PanelObject",
                            original_data = NULL,
                            panel_data_type = NULL,
                            labels = NULL,
+                           scores = NULL, #add scores for saving later if called
                            tree = tibble::tibble(
                              id=numeric(), parentId=numeric(),
                              name=character(), type=character(),
@@ -62,6 +63,9 @@ PanelObject <- R6::R6Class("PanelObject",
                              self$trigger_newdat()
 
                              self$labels <- tibble::tibble(
+                               panel_string = unique(self$newdat$panel_string))
+
+                             self$scores <- tibble::tibble( #initialize scores
                                panel_string = unique(self$newdat$panel_string))
 
                              if(1 %in% self$tree$id){
@@ -150,6 +154,16 @@ PanelObject <- R6::R6Class("PanelObject",
                              }
                              invisible(self)
                            },
+  update_scores = function(score_name = NA){
+    if(score_name %in% names(self$scores)){
+      self$scores <- self$scores %>% select(-{{score_name}})
+    }
+    self$scores <- self$scores %>%
+      left_join(self$filtereddf %>%
+                  select(panel_string, score) %>%
+                  rename({{score_name}}:= score), by=join_by(panel_string))
+    invisible(self)
+  },
                            reset_filter_criterion = function(){
                              self$cur_selection <- self$selected_state
                              self$invert_selection <- 0
