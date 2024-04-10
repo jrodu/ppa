@@ -77,6 +77,7 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
         filterbuttonUI(ns("filterselectize")),
         shiny::actionButton(ns("edit_filter"), "Edit"),
         shiny::actionButton(ns("filterValue"), "Select by Score"),
+        shiny::actionButton(ns("saveScores"), "Save Scores"),
         # shiny::br(),
         # shiny::actionButton(ns("save"), "Save score functions"),
         # shiny::actionButton(ns("save_and_quit"), "Save functions and quit")
@@ -137,7 +138,7 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
                  errorhandle <<- "throwing some warnings here..."})
 
       if(is.null(errorhandle)){
-      pipeline_variables$filtereddf <-tmp_try
+      pipeline_variables$filtereddf <-tmp_try %>% mutate(name=filter_fn())
       cutoff <- stats::quantile(pipeline_variables$filtereddf$score, probs=.05)
 
       filter_cutoff <- pipeline_variables$filtereddf %>%
@@ -193,6 +194,18 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
       }
 
     })
+
+    ####### save scores
+
+    shiny::observeEvent(input$saveScores, {
+
+      #if(isTruthy(input$filterselectize)){
+        pipeline_variables$update_scores(pipeline_variables$filtereddf$name %>% unique())
+      #}
+
+    }, ignoreInit = TRUE)
+
+
     shiny::observeEvent(input$edit_filter, {
 
       shinyalert::shinyalert(
@@ -217,6 +230,8 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
                              ))
 
     }, ignoreInit = TRUE)
+
+
 
     shiny::observeEvent(input$submitedfilterfunction, {
 

@@ -180,6 +180,13 @@ save_vars <- function(pipe_vars, session_name){
     varlist$labels <- labs
   }
 
+  if(length(pipe_vars$scores)>1){
+    scoreit <- pipe_vars$scores
+    class(scoreit$panel_string) <- pipe_vars$panel_data_type
+    scoreit <- scoreit %>% dplyr::rename(!!pipe_vars$panel_name := .data$panel_string)
+    varlist$scores <- scoreit
+  }
+
   if(nrow(pipe_vars$tree)>1) varlist$workflow_tree <- pipe_vars$tree
 
   if(nrow(pipe_vars$filter_selection_functions)>0){
