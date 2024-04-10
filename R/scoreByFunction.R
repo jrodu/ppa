@@ -138,7 +138,7 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
                  errorhandle <<- "throwing some warnings here..."})
 
       if(is.null(errorhandle)){
-      pipeline_variables$filtereddf <-tmp_try %>% mutate(name=filter_fn())
+      pipeline_variables$filtereddf <-tmp_try %>% dplyr::mutate(name=filter_fn())
       cutoff <- stats::quantile(pipeline_variables$filtereddf$score, probs=.05)
 
       filter_cutoff <- pipeline_variables$filtereddf %>%
@@ -200,7 +200,7 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
     shiny::observeEvent(input$saveScores, {
 
       #if(isTruthy(input$filterselectize)){
-        pipeline_variables$update_scores(pipeline_variables$filtereddf$name %>% unique())
+        pipeline_variables$update_scores(pipeline_variables$filtereddf$name %>% base::unique())
       #}
 
     }, ignoreInit = TRUE)

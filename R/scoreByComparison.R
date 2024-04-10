@@ -165,7 +165,7 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
                    errorhandle <<- "throwing some warnings here..."})
 
       if(is.null(errorhandle)){
-      pipeline_variables$filtereddf <- tmp_try %>% mutate(name=paste0(compare_fn(), '_', base_panel))
+      pipeline_variables$filtereddf <- tmp_try %>% dplyr::mutate(name=paste0(compare_fn(), '_', base_panel))
 
       tryCatch(scores <-  pipeline_variables$filtereddf %>%
                  dplyr::filter(
@@ -249,7 +249,7 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
     shiny::observeEvent(input$saveScores, {
 
       #if(isTruthy(input$filterselectize)){
-      pipeline_variables$update_scores(pipeline_variables$filtereddf$name %>% unique())
+      pipeline_variables$update_scores(pipeline_variables$filtereddf$name %>% base::unique())
       #}
 
     }, ignoreInit = TRUE)

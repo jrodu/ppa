@@ -159,10 +159,9 @@ PanelObject <- R6::R6Class("PanelObject",
       self$scores <- self$scores %>% select(-{{score_name}})
     }
     self$scores <- self$scores %>%
-      left_join(self$filtereddf %>%
-                  select(panel_string, score) %>%
-                  rename({{score_name}}:= score), by=join_by(panel_string))
-    print(self$scores)
+      dplyr::left_join(self$filtereddf %>%
+                         dplyr::select(panel_string, score) %>%
+                         dplyr::rename({{score_name}}:= score), by=dplyr::join_by(panel_string))
     invisible(self)
   },
                            reset_filter_criterion = function(){
