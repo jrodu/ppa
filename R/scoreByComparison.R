@@ -86,6 +86,7 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
       shiny::actionButton(ns("edit_comparison"), "Edit"),
       shiny::actionButton(ns("filterSelection"), "Select by Comparison"),
       shiny::actionButton(ns("saveScores"), "Save Scores"),
+      shiny::actionButton(ns("clearScores"), "Clear Scores"),
       #### the ecdf plot
       #plotECDFUI(ns("ecdf")),
       # shiny::br(),
@@ -154,7 +155,6 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
 
       if(is.null(errorhandle)){
         base_panel <- pipeline_variables$cur_selection
-        print(base_panel)
         tryCatch(
             tmp_try <- get_comparison_scores(
           pipeline_variables$df_main,
@@ -182,8 +182,8 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
       new_centers <- pipeline_variables$centers
       new_centers <- new_centers %>% dplyr::select(-.data$score) %>%
         dplyr::left_join(pipeline_variables$filtereddf, by="panel_string") %>%
-        dplyr::mutate(use_score=1) %>% dplyr::mutate(stroke_width = ifelse(panel_string==base_panel, 5, 1))
-      print(new_centers$stroke_width)
+        dplyr::mutate(use_score=1) %>%
+        dplyr::mutate(stroke_width = ifelse(panel_string==base_panel, 5, 1))
 
       shiny::updateTextInput(session, "functionName", value=character())
       shiny::updateTextAreaInput(session, "filtercomp", value=character())
@@ -320,6 +320,25 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
       gargoyle::trigger("compare_selectize_update")
 
     })
+
+    shiny::observeEvent(input$clearScores, {
+
+      pipeline_variables$define_filtered()
+      session$sendCustomMessage(
+        type = 'clear_ecdf',
+        message = 'clear')
+      session$sendCustomMessage(
+        type = 'panelPlot_set',
+        message = list(centers=jsonlite::toJSON(pipeline_variables$centers),
+                       sel=character(0)))
+
+
+    }, ignoreInit = TRUE)
+
+    # new shiny clear comparison button
+    # clear_ecdf through javascript message handler
+    #define_filtered()
+    #send new selections (none) to canvas (maybe try without this?  Should fail.)
 
 
     # shiny::observeEvent(input$save | input$save_and_quit, {
