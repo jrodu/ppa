@@ -191,6 +191,8 @@ save_vars <- function(pipe_vars, session_name){
 
   if(nrow(pipe_vars$filter_selection_functions)>0){
     varlist$comparison_functions <- pipe_vars$filter_selection_functions}
+  # the format eval(parse(text=paste0(comparison_functions$name[1], '<- function(panel_data, panel_selected){', comparison_functions$fn[1], '}')))
+
   if(nrow(pipe_vars$filter_value_functions)>0){
     varlist$score_functions <- pipe_vars$filter_value_functions}
   if(nrow(pipe_vars$transform_functions)>0){
