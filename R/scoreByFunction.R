@@ -78,6 +78,7 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
         shiny::actionButton(ns("edit_filter"), "Edit"),
         shiny::actionButton(ns("filterValue"), "Select by Score"),
         shiny::actionButton(ns("saveScores"), "Save Scores"),
+        shiny::actionButton(ns("clearScores"), "Clear Scores"),
         # shiny::br(),
         # shiny::actionButton(ns("save"), "Save score functions"),
         # shiny::actionButton(ns("save_and_quit"), "Save functions and quit")
@@ -265,6 +266,20 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
       gargoyle::trigger("filter_selectize_update")
 
     })
+
+    shiny::observeEvent(input$clearScores, {
+
+      pipeline_variables$define_filtered()
+      session$sendCustomMessage(
+        type = 'clear_ecdf',
+        message = 'clear')
+      session$sendCustomMessage(
+        type = 'panelPlot_set',
+        message = list(centers=jsonlite::toJSON(pipeline_variables$centers),
+                       sel=character(0)))
+
+
+    }, ignoreInit = TRUE)
 
         # shiny::observeEvent(input$save | input$save_and_quit, {
         #   score_functions <<- pipeline_variables$filter_value_functions
