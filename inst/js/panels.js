@@ -193,7 +193,8 @@ function update_rect(dat) {
           .attr("width", function(d) {return xScale(+d.width); } )
           .attr("height", yScale(1) )
           .attr("selected", function() {return current_selection.includes(d3.select(this).attr("id")) ? 1: 0; })
-          .attr("fill-opacity", function() { return (d3.select(this).attr("selected")>0) ? .5 : 0; }),
+          .attr("fill-opacity", function() { return (d3.select(this).attr("selected")>0) ? .5 : 0; })
+          .attr("stroke-width", function(d) { return d.stroke_width; }),
         exit => exit
         .remove()
         );
@@ -427,7 +428,6 @@ function set_current_selection(message){
 
 
         }
-
         update_rect(data);
 
       Shiny.setInputValue(
