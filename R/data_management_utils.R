@@ -190,13 +190,57 @@ save_vars <- function(pipe_vars, session_name){
   if(nrow(pipe_vars$tree)>1) varlist$workflow_tree <- pipe_vars$tree
 
   if(nrow(pipe_vars$filter_selection_functions)>0){
-    varlist$comparison_functions <- pipe_vars$filter_selection_functions}
+    comparison_functions <- pipe_vars$filter_selection_functions
+    for(i in seq_along(comparison_functions)){
+      tryCatch({
+        eval(parse(
+        text=paste0(
+          comparison_functions$name[i],
+          '<- function(panel_data,
+          panel_selected){',
+          comparison_functions$fn[i], '}')), envir = .GlobalEnv)},
+        error = function(msg){
+            message(paste0("Warning, '",comparison_functions$name[i], "' didn't save to environment properly"))
+          }
+      )
+    }
+    varlist$comparison_functions <- pipe_vars$filter_selection_functions$name
+    }
   # the format eval(parse(text=paste0(comparison_functions$name[1], '<- function(panel_data, panel_selected){', comparison_functions$fn[1], '}')))
 
   if(nrow(pipe_vars$filter_value_functions)>0){
-    varlist$score_functions <- pipe_vars$filter_value_functions}
+    score_functions <- pipe_vars$filter_value_functions
+    for(i in seq_along(score_functions)){
+      tryCatch({
+        eval(parse(
+          text=paste0(
+            score_functions$name[i],
+            '<- function(panel_data){',
+            score_functions$fn[i], '}')), envir = .GlobalEnv)},
+        error = function(msg){
+          message(paste0("Warning, '",score_functions$name[i], "' didn't save to environment properly"))
+        }
+      )
+    }
+    varlist$score_functions <- pipe_vars$filter_value_functions$name
+  }
+
   if(nrow(pipe_vars$transform_functions)>0){
-    varlist$transform_functions <- pipe_vars$transform_functions}
+    transform_functions <- pipe_vars$transform_functions
+    for(i in seq_along(transform_functions)){
+      tryCatch({
+        eval(parse(
+          text=paste0(
+            transform_functions$name[i],
+            '<- function(panel_data){',
+            transform_functions$fn[i], '}')), envir = .GlobalEnv)},
+        error = function(msg){
+          message(paste0("Warning, '",transform_functions$name[i], "' didn't save to environment properly"))
+        }
+      )
+    }
+    varlist$transform_functions <- pipe_vars$transform_functions$name
+    }
 
   if(!is.null(pipe_vars$hide_panels)){
     varlist$excluded_panels <- pipe_vars$hide_panels
