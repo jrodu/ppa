@@ -191,7 +191,7 @@ save_vars <- function(pipe_vars, session_name){
 
   if(nrow(pipe_vars$filter_selection_functions)>0){
     comparison_functions <- pipe_vars$filter_selection_functions
-    for(i in seq_along(comparison_functions)){
+    for(i in seq_len(nrow(comparison_functions))){
       tryCatch({
         eval(parse(
         text=paste0(
@@ -210,7 +210,7 @@ save_vars <- function(pipe_vars, session_name){
 
   if(nrow(pipe_vars$filter_value_functions)>0){
     score_functions <- pipe_vars$filter_value_functions
-    for(i in seq_along(score_functions)){
+    for(i in seq_len(nrow(score_functions))){
       tryCatch({
         eval(parse(
           text=paste0(
@@ -227,7 +227,7 @@ save_vars <- function(pipe_vars, session_name){
 
   if(nrow(pipe_vars$transform_functions)>0){
     transform_functions <- pipe_vars$transform_functions
-    for(i in seq_along(transform_functions)){
+    for(i in seq_len(nrow(transform_functions))){
       tryCatch({
         eval(parse(
           text=paste0(
