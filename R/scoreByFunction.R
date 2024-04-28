@@ -130,6 +130,7 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
           errorhandle <<- "there might be an issue with your parsing"})
 
       if(is.null(errorhandle)){
+        if(test_value_scores_numeric(pipeline_variables$df_main, f_compare)){
       tryCatch(
         tmp_try <- get_value_scores(pipeline_variables$df_main, f_compare) %>%
           dplyr::mutate(use_score=1, use_pos=0),
@@ -182,6 +183,12 @@ scoreByFunctionServer <- function(id, pipeline_variables) {
                  edit the function."),
           type = "error")
       }
+        }else{
+          shinyalert::shinyalert(
+            paste0("Oops!",
+                   "Code didn't run. Are you returning a scalar?"),
+            type = "error")
+        }
         }else{
           shinyalert::shinyalert(
             paste0("Oops!",

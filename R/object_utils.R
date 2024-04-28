@@ -339,6 +339,25 @@ get_value_scores <- function(data, fn1, fn2=NULL){
   }
 }
 
+test_value_scores_numeric <- function(data, fn1, fn2=NULL){
+  score <- NULL
+  scorex <- NULL
+  scorey <- NULL
+  tmp_data <- data %>% dplyr::group_by(.data$panel_string) %>%
+    dplyr::mutate(group_id_test_ppa = dplyr::cur_group_id()) %>%
+    dplyr::ungroup() %>% dplyr::filter(group_id_test_ppa == 1) %>%
+    dplyr::select(-group_id_test_ppa)
+  if(is.null(fn2)){
+    value <- fn1(tmp_data)
+    rlang::is_scalar_double(value) || rlang::is_scalar_integer(value)
+  } else {
+    value1 <- fn1(tmp_data)
+    value2 <- fn2(tmp_data)
+    (rlang::is_scalar_double(value1) || rlang::is_scalar_integer(value1)) &&
+      (rlang::is_scalar_double(value2) || rlang::is_scalar_integer(value2))
+  }
+}
+
 
 
 #' Function to transform data according to user specified function
