@@ -315,6 +315,29 @@ get_comparison_scores <- function(df, panel, fn){
     tidyr::unnest(cols=c(score)) %>% dplyr::select(score, .data$panel_string)
 }
 
+#' Utility function to help test output type from user supplied comparison
+#'
+#' @param df data
+#' @param panel panel chosen for comparison
+#' @param fn function to perform comparison
+#'
+#' @return boolean
+#'
+test_comparison_scores_numeric <- function(df, panel, fn){
+  data <- NULL
+  score <- NULL
+  tmp_df <- df %>% dplyr::group_by(.data$panel_string) %>%
+    dplyr::mutate(group_id_test_ppa = dplyr::cur_group_id()) %>%
+    dplyr::ungroup() %>% dplyr::filter(group_id_test_ppa == 1) %>%
+    dplyr::select(-group_id_test_ppa)
+  comp_df <- df %>% dplyr::filter(.data$panel_string %in% panel)
+  value <- fn(tmp_df, comp_df)
+
+  rlang::is_scalar_double(value) || rlang::is_scalar_integer(value)
+}
+
+
+
 #' Compute scores from user supplied function
 #'
 #' @param data data set
@@ -339,6 +362,14 @@ get_value_scores <- function(data, fn1, fn2=NULL){
   }
 }
 
+#' Utility function to help test output type from user supplied score function
+#'
+#' @param data data set
+#' @param fn1 function to calculate score
+#' @param fn2 optional function if calculating scores for scatterplot
+#'
+#' @return boolean
+#'
 test_value_scores_numeric <- function(data, fn1, fn2=NULL){
   score <- NULL
   scorex <- NULL

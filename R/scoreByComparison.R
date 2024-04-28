@@ -155,6 +155,9 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
 
       if(is.null(errorhandle)){
         base_panel <- pipeline_variables$cur_selection
+        if(test_comparison_scores_numeric(pipeline_variables$df_main,
+                                          pipeline_variables$cur_selection,
+                                          f_compare)){
         tryCatch(
             tmp_try <- get_comparison_scores(
           pipeline_variables$df_main,
@@ -232,6 +235,12 @@ scoreByComparisonServer <- function(id, pipeline_variables) {
           type = "error")
       }
       }else{
+        shinyalert::shinyalert(
+          paste0("Oops!",
+                 "Code didn't run. Are you returning a scalar?"),
+          type = "error")
+        }
+        }else{
         shinyalert::shinyalert(
           paste0("Oops!",
                  "Code didn't run.  Perhaps there is a typo in your function?
