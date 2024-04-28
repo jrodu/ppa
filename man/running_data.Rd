@@ -3,7 +3,7 @@
 \docType{data}
 \name{running_data}
 \alias{running_data}
-\title{Simulated data with row and column information}
+\title{Real data collected by Alexandra F Dejong Lempke using Runscribe sensors}
 \format{
 \subsection{\code{running_data}}{
 
@@ -68,6 +68,6 @@ personal collection from experienced funner
 running_data
 }
 \description{
-simulated from a normal distribution-- no signal
+Real data collected by Alexandra F Dejong Lempke using Runscribe sensors
 }
 \keyword{datasets}
