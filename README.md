@@ -34,72 +34,92 @@ pushed to CRAN.
 
 Consider the following set of time series
 
-    #> Warning: package 'ggplot2' was built under R version 4.3.1
-    #> Warning: package 'purrr' was built under R version 4.3.1
+``` r
+library(tidyverse)
+library(ppa)
+
+set.seed(140)
+
+#generate 4 different signals
+tsa <- 1:50
+tsb <- c(rep(1, 25), rep(50, 25))
+tsc <- c(seq(50 ,41, length.out=20), seq(40, 11, length.out=10), seq(10,1, length.out=20))
+tsd <- rep(25, 50)
+
+data <- tibble(seconds = rep(1:50, times=100),
+               haty=c(rep(tsa, times=25),
+                      rep(tsb, times=25),
+                      rep(tsc, times=25), rnorm(1250, 25, 15)),
+               series=c(rep(sample(1:100), each=50)),
+               identity=c(rep(c('a', 'b', 'c', 'd'), each=1250)),
+               noise=c(rnorm(5000, sd=15)),
+               y=haty+noise) %>% arrange(series)
+
+corrupt_one_series <- sample(1:100, 1)
+data <- data %>% mutate(y=ifelse(series==corrupt_one_series, haty, y))
+
+data %>% ggplot(aes(seconds, y))+geom_line(aes(group=series)) + facet_wrap(~identity) +
+     xlab(NULL) +
+     ylab(NULL) +
+     theme(axis.text.x = element_blank(), axis.title.y = element_blank(),
+           axis.text.y = element_blank(),
+           axis.title.x = element_blank(),
+           panel.border = element_blank(), panel.background = element_rect(fill="white"),
+           panel.grid = element_line(colour = "grey70"))
+```
 
 <img src="man/figures/README-oracle-1.png" width="30%" />
 
-In the previous figure, the signal is relatively clear. However,
-consider the following figures (these are the same time series from
-above, but in the first figure the labels are correlated with the
-variation across time series but noisy; in the second figure the labels
-are random and thus are not useful):
+In the previous figure, the signal is relatively clear. However, what if
+we did not have access to the grouping labels?
 
-<img src="man/figures/README-noisy-1.png" width="30%" /><img src="man/figures/README-noisy-2.png" width="30%" />
+<img src="man/figures/README-noisy-1.png" width="30%" />
 
-In the last two situations, analysis would be difficult. No additional
-variables are available that could help the analyst pull apart the time
-series in a useful way. These figure alone are insufficient for
-identifying the main signal present in the time series. Plot panel
-analysis can help with this!
+Analysis would be difficult. No additional variables are available that
+could help the analyst easily pull apart the time series in a useful
+way. Plot panel analysis can help with this!
 
 **But before we delve in to how plot panel analysis can help identify
 signal across time series, let’s look at a much simpler problem that can
 be solved incredibly fast with plot panel analysis…** Embedded in each
-of these figures (including the first figure showing perfect signal) are
-two “degenerate” time series that are just straight lines. Can you
-identify them? Would you have known to look for them? If you could
-identify them visually, could you quickly locate them in the dataset and
-remove them from analysis?
+of these figures (including the first figure) is one “degenerate” time
+series that has no added noise. Can you identify it? Would you have
+known to look for it had you not seen the data generating code? If you
+could identify them visually, could you quickly locate them in the
+dataset and remove them from analysis?
 
 This is easy to do with plot panel analysis (and using the ppa app).
 Here are the steps.
 
-1.  Run the following code in your console
+1.  Copy the code that generates the data above and paste and run it in
+    your console. You should now have a variable called “data” in your
+    environment. Run following code in your console
 
 ``` r
-example_data_from_paper %>% ppa(seconds, y, series, 'line')
+data %>% ppa(seconds, y, series, 'line')
 ```
 
-2.  locate the two degenerate time series and click on them. They should
-    turn grey.
+2.  locate the degenerate time series and click on it. It should turn
+    grey.
 3.  Click on the “Exclude/Unexclude Panels” checkbox.
 4.  Click on the “exclude” button. The degenerate time series will
     disappear.
 5.  Exit the app by closing the window.
 6.  A vector called “excluded_panels” will show up in your environment
-    which contains the identity of the two degenerate time series (the
-    `series` variable in the original dataset)
+    which contains the unique panel id of the degenerate time series
+    (this is the `series` variable in the original dataset)
 
 **Simple!**
 
 ## Some features of the PPA app that are useful for plot panel analysis
 
 Let’s take a look at some of the features of the PPA app. It’s easiest
-to read this list while playing around with the app, so here are a few
-examples you can run.
+to read this list while playing around with the app, so here is an
+example you can run.
 
 ``` r
 #example from above
-example_data_from_paper %>% ppa(seconds, y, series, 'line')
-
-#another dataset with more panels
-example_data_no_row_col %>% ppa(x, y, z, 'line')
-
-#another example where the grid row and column variable mapping are specified, ensuring that panels that belong in the same row (and/or column) are kept together appropriately.
-example_data_with_row_col %>% ppa(x, y, z, 'line', rowgroup=rows, colgroup=cols)
-
-#you can also specify only rowgroup or colgroup.
+data %>% ppa(seconds, y, series, 'line')
 ```
 
 1.  Click on the “panel plot properties” button to
@@ -131,17 +151,26 @@ example_data_with_row_col %>% ppa(x, y, z, 'line', rowgroup=rows, colgroup=cols)
     (that have been previously labeled) by choosing a label or set of
     labels.
 7.  The “Select Panels by Score Function” checkbox allows you to
-    - create a function to “measure” each time series based on your
-      visual observations
+    - create a feature function to “measure” each time series based on
+      your visual observations
+    - edit a feature function you already created (this is useful when
+      you realize that you made a typo or that your feature function is
+      not capturing what you thought it would).
     - score each time series based on your function
     - select panels by moving the threshold on the resulting ECDF plot
     - invert the selected panels (i.e. selecting panels that lie “above”
       the threshold rather than “below”)
     - investigate the score of individual time series by hovering over
       them and exposing a tooltip.
+    - save the scores to your R environment (the scores are saved in a
+      data set whose columns are named based on the name of the function
+      that produced the scores)
+    - the functions you created will be saved to your environment as
+      immediately usable functions, along with a list that contains the
+      name of the functions created during that session.
 
-Here is a score you can try (note- don’t forget to name the function so
-that you can access it later!):
+Here is a feature function you can try (note- don’t forget to name the
+function so that you can access it later!):
 
 ``` r
 panel_data %>% summarize(max=max(y)) %>% pull(max)
@@ -149,11 +178,17 @@ panel_data %>% summarize(max=max(y)) %>% pull(max)
 #or (same thing, different syntax)
 
 max(panel_data$y)
+
+#you can copy and paste either of these code snippets into the popup after you click on create new function
 ```
 
 8.  The “Select Panels by Comparison” checkbox allows you to do the same
-    as selecting by score function, but using a user-suppled function
+    as selecting by score function, but with a user-suppled function
     that compares each panel to a selected panel.
+    - When scores are saved using this functionality, since the score
+      depends on the “base comparison panel,” the column name for the
+      scores is in the format
+      “name-of-function_base-comparison-panel-id”
 9.  The “Arrange Panels in Scatter Plot” checkbox allows you to observe
     the relationship between two different measurement functions from
     the “Select by Score Function” module.
@@ -171,16 +206,16 @@ max(panel_data$y)
       and you can apply the desired transformation (or continue your
       investigation) from there.
 
-Here are a transformation you can try (note- don’t forget to name the
+Here is a transformation you can try (note- don’t forget to name the
 function so that you can access it later!):
 
 ``` r
 panel_data %>% mutate(y=y^2)
 ```
 
-Go ahead, try a few! Try to chain them together in different ways and
-navigate through the various transformations to get a feel for using the
-navigation tree.
+Go ahead, try a few transformations! Try to chain them together in
+different ways and navigate through the various transformations to get a
+feel for using the navigation tree.
 
 ## Tip
 
